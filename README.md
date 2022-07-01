@@ -1,4 +1,4 @@
-![Scala CI](https://github.com/flimeyio/codi-native/workflows/Scala%20CI/badge.svg)
+![Scala CI](https://github.com/modicio/codi-native/workflows/Scala%20CI/badge.svg)
 
 # codi-native
 
