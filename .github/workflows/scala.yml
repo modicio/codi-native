@@ -25,17 +25,18 @@ jobs:
       run: sbt test
     - name: build doc
       run: sbt doc
-    - name: 'Upload ScalaDoc'
+    - name: make package
+      run: sbt package
+    - name: 'Upload Compiled Sources'
       uses: actions/upload-artifact@v3
       with:
-        name: api
-        path: target/scala-2.13/api
-        retention-days: 5
+        name: dist
+        path: target/scala-2.13
     - name: Download a Build Artifact
       uses: actions/download-artifact@v3.0.0
       with:
-        name: api
-        path: doc
+        name: dist
+        path: dist
     - name: Push DOC
       uses: datalbry/copy_folder_to_another_repo_action@1.0.0
       env:
