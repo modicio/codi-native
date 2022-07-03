@@ -13,4 +13,4 @@ A microframework for user-driven modelling of application-parts at runtime
 
 ## about
 
-This project was initally designed and contributed by Karl Kegel (KKegel) as part of the Master-Thesis *Deep Models at Runtime for User-Driven Flexible Systems* at TU-Dresden. The Framework goals and design are especially covered in the capters *Problem-Space Analyis* and *Solution Concept*. 
+This project was initally designed and contributed by Karl Kegel (KKegel) as part of the Master-Thesis *Deep Models at Runtime for User-Driven Flexible Systems* at TU-Dresden ([full text](https://www.researchgate.net/publication/361725823_Deep_ModelsRuntime_for_User-Driven_Flexible_Systems)). The Framework goals and design are especially covered in the capters *Problem-Space Analyis* and *Solution Concept*. 
