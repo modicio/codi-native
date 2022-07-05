@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package codi.verification
-
-import codi.core.Rule
+package codi.core.values
 
 /**
- * TODO documentation
+ * TODO add documentation
+ * @param nativeValue
  */
-trait DefinitionVerifier {
+class ConcreteAttribute(nativeValue: String) extends ValueDescriptor(nativeValue) {
 
-  def verify(rules: Set[Rule]): Boolean
+  def attributeValue: String = elements.head
+
+  override def serializeSimple: String = attributeValue + " final=" + isFinal
 
 }

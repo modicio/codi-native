@@ -16,7 +16,7 @@
 package codi.core
 
 import codi.core.datamappings.{FragmentData, RuleData}
-import codi.core.rules.{AssociationRule, Rule}
+import codi.core.rules.AssociationRule
 import codi.util.Observer
 import codi.verification.{DefinitionVerifier, ModelVerifier}
 
@@ -65,7 +65,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   def getParents: Set[Fragment]
 
   /**
-   * <p> Add a [[codi.core.rules.Rule Rule]] to this Fragment.
+   * <p> Add a [[codi.core.Rule Rule]] to this Fragment.
    * <p> See the concrete implementations for more information.
    * <p> A concrete implementation may require the Fragment to be unfolded!
    * <p> A concrete implementation may change the fold state of the Fragment
@@ -75,7 +75,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   def applyRule(rule: Rule): Unit
 
   /**
-   * <p> Remove a [[codi.core.rules.Rule Rule]] from this Fragment.
+   * <p> Remove a [[codi.core.Rule Rule]] from this Fragment.
    * <p> See the concrete implementations for more information.
    * <p> A concrete implementation may require the Fragment to be unfolded!
    * <p> A concrete implementation may change the fold state of the Fragment

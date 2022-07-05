@@ -15,17 +15,19 @@
  */
 package codi.core.rules
 
+import codi.core.Rule
+
 /**
- * <p> A concrete [[codi.core.rules.Rule Rule]] implementation to represent attributes in the native unlinked model.
+ * <p> A concrete [[codi.core.Rule Rule]] implementation to represent attributes in the native unlinked model.
  * <br />
  * <br />
  * <p> <strong>String format: "ID:NAME:DATATYPE:NON_EMPTY"</strong>
- * <P> where ID is the unique technical identifier of the [[codi.core.rules.Rule Rule]]
+ * <P> where ID is the unique technical identifier of the [[codi.core.Rule Rule]]
  * <p> where NAME is the arbitrary name of the attribute
  * <p> where DATATYPE is the type-value of the attribute ["STRING", "NUMBER", "DATETIME"]
  * <P> where NON_EMPTY describes if a concrete attribute must always have a non-empty value
  *
- * @see [[codi.core.rules.Rule]]<p>[[codi.core.datamappings.RuleData]]
+ * @see [[codi.core.Rule]]<p>[[codi.core.datamappings.RuleData]]
  * @param nativeValue the string representation in the native-language format
  */
 class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
@@ -60,7 +62,7 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
   private def parseNonEmpty(nativeValue: String): Boolean = nativeValue.split(":")(3).toBoolean
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#serialise Rule.serialise()]]
+   * <p>Implementation of [[codi.core.Rule#serialise Rule.serialise()]]
    *
    * @return String of serialised rule
    */
@@ -69,7 +71,7 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
   }
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#serialiseSimple Rule.serialiseSimple()]].
+   * <p>Implementation of [[codi.core.Rule#serialiseSimple Rule.serialiseSimple()]].
    * <p>This method must only be used for human-readable logs and outputs and not for technical purposes!
    *
    * @return String of simplified serialisation
@@ -79,7 +81,7 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
   }
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#verify Rule.verify()]]
+   * <p>Implementation of [[codi.core.Rule#verify Rule.verify()]]
    * <p>FIXME not implemented yet, returns always true
    *
    * @return Boolean - if the rule is valid in terms of producing a valid serialisation
@@ -89,10 +91,10 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
   }
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#fork Rule.fork()]].
+   * <p>Implementation of [[codi.core.Rule#fork Rule.fork()]].
    *
    * @param identity the identity of an instantiated [[codi.core.Fragment Fragment]]
-   * @return [[codi.core.rules.Rule Rule]] - copy of this Rule with changed identity value and new ID
+   * @return [[codi.core.Rule Rule]] - copy of this Rule with changed identity value and new ID
    */
   override def fork(identity: String): Rule = AttributeRule.create(name, datatype, nonEmpty, Some(Rule.UNKNOWN_ID))
 
@@ -106,7 +108,7 @@ object AttributeRule {
   /**
    * <p> Create a new [[codi.core.rules.AttributeRule AttributeRule]] from raw data.
    * <p> This serves as a factory method for the AttributeRule.
-   * <p> If an empty idOption is provided, the id is set to [[codi.core.rules.Rule#UNKNOWN_ID UNKNOWN_ID]] and must be
+   * <p> If an empty idOption is provided, the id is set to [[codi.core.Rule#UNKNOWN_ID UNKNOWN_ID]] and must be
    * changed manually.
    *
    * @param name     name of the attribute

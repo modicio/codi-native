@@ -15,17 +15,19 @@
  */
 package codi.core.rules
 
+import codi.core.Rule
+
 /**
- * <p> A concrete [[codi.core.rules.Rule Rule]] implementation to represent extensions in the native unlinked model.
+ * <p> A concrete [[codi.core.Rule Rule]] implementation to represent extensions in the native unlinked model.
  * This Rule does not logically distinguish between reference extensions and instantiated extensions.
  * <br />
  * <br />
  * <p> <strong>String format: "ID:PARENT_IDENTITY:PARENT_NAME"</strong>
- * <P> where ID is the unique technical identifier of the [[codi.core.rules.Rule Rule]]
+ * <P> where ID is the unique technical identifier of the [[codi.core.Rule Rule]]
  * <p> where PARENT_IDENTITY is the identity value of the parent [[codi.core.Fragment Fragment]]
  * <p> where TARGET_NAME is the name of the parent [[codi.core.Fragment Fragment]]
  *
- * @see [[codi.core.rules.Rule]]<p>[[codi.core.datamappings.RuleData]]
+ * @see [[codi.core.Rule]]<p>[[codi.core.datamappings.RuleData]]
  * @param nativeValue the string representation in the native-language format
  */
 class ExtensionRule(nativeValue: String) extends Rule(nativeValue) {
@@ -50,7 +52,7 @@ class ExtensionRule(nativeValue: String) extends Rule(nativeValue) {
   private def parseParentIdentity(nativeValue: String): String = nativeValue.split(":")(1)
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#serialise Rule.serialise()]]
+   * <p>Implementation of [[codi.core.Rule#serialise Rule.serialise()]]
    *
    * @return String of serialised rule
    */
@@ -59,7 +61,7 @@ class ExtensionRule(nativeValue: String) extends Rule(nativeValue) {
   }
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#serialiseSimple Rule.serialiseSimple()]].
+   * <p>Implementation of [[codi.core.Rule#serialiseSimple Rule.serialiseSimple()]].
    * <p>This method must only be used for human-readable logs and outputs and not for technical purposes!
    *
    * @return String of simplified serialisation
@@ -69,7 +71,7 @@ class ExtensionRule(nativeValue: String) extends Rule(nativeValue) {
   }
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#verify Rule.verify()]]
+   * <p>Implementation of [[codi.core.Rule#verify Rule.verify()]]
    * <p>FIXME not implemented yet, returns always true
    *
    * @return Boolean - if the rule is valid in terms of producing a valid serialisation
@@ -79,12 +81,12 @@ class ExtensionRule(nativeValue: String) extends Rule(nativeValue) {
   }
 
   /**
-   * <p>Implementation of [[codi.core.rules.Rule#fork Rule.fork()]].
+   * <p>Implementation of [[codi.core.Rule#fork Rule.fork()]].
    * <p> In this case of an ExtensionRule, especially the parent identity (which is in the reference case set to the reference identity)
    * is replaced by the provided new identity of the instantiation.
    *
    * @param identity the identity of an instantiated [[codi.core.Fragment Fragment]]
-   * @return [[codi.core.rules.Rule Rule]] - copy of this Rule with changed identity value and new ID
+   * @return [[codi.core.Rule Rule]] - copy of this Rule with changed identity value and new ID
    */
   override def fork(identity: String): Rule = ExtensionRule.create(parentName, identity, Some(Rule.UNKNOWN_ID))
 
@@ -100,7 +102,7 @@ object ExtensionRule {
   /**
    * <p> Create a new [[codi.core.rules.ExtensionRule ExtensionRule]] from raw data.
    * <p> This serves as a factory method for the ExtensionRule.
-   * <p> If an empty idOption is provided, the id is set to [[codi.core.rules.Rule#UNKNOWN_ID UNKNOWN_ID]] and must be
+   * <p> If an empty idOption is provided, the id is set to [[codi.core.Rule#UNKNOWN_ID UNKNOWN_ID]] and must be
    * changed manually.
    *
    * @param parentName     name of the parent [[codi.core.Fragment Fragment]]

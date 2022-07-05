@@ -15,8 +15,6 @@
  */
 package codi.core
 
-import codi.core.rules.Rule
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

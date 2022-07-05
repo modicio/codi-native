@@ -15,17 +15,19 @@
  */
 package codi.core.datamappings
 
+import codi.core.Rule
+
 /**
- * <p> Tuple to represent a [[codi.core.rules.Rule Rule]] for serialisation.
+ * <p> Tuple to represent a [[codi.core.Rule Rule]] for serialisation.
  * This class can contain any concrete Rule.
  * This class does not differentiate between instantiated and reference Rules.
  *
- * @param id           technical identifier of the rule. The [[codi.core.rules.Rule Rule]] may assign automatically generated values.
- *                     if no such value exist, the id has the value of [[codi.core.rules.Rule#UNKNOWN_ID UNKNOWN_ID]] and must be
+ * @param id           technical identifier of the rule. The [[codi.core.Rule Rule]] may assign automatically generated values.
+ *                     if no such value exist, the id has the value of [[codi.core.Rule#UNKNOWN_ID UNKNOWN_ID]] and must be
  *                     assigned manually.
  * @param fragmentName name of the [[codi.core.Fragment Fragment]] this rule is part of
  * @param identity     identity of the [[codi.core.Fragment Fragment]] this rule is part of
- * @param nativeValue  serialised value of the [[codi.core.rules.Rule Rule]]. Depending on the serialised format, all
+ * @param nativeValue  serialised value of the [[codi.core.Rule Rule]]. Depending on the serialised format, all
  *                     different concrete rules must be distinguishable
  */
 case class RuleData(id: String, fragmentName: String, identity: String, nativeValue: String)

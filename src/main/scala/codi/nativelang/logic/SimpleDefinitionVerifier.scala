@@ -15,7 +15,7 @@
  */
 package codi.nativelang.logic
 
-import codi.core.rules.Rule
+import codi.core.Rule
 import codi.verification.DefinitionVerifier
 
 /**

@@ -19,7 +19,7 @@ import codi.core.rules._
 
 /**
  * <p> The Base trait defines any class producing or forwarding a [[codi.core.Definition Definition]] compatible specification
- * of [[codi.core.rules.Rule Rules]].
+ * of [[codi.core.Rule Rules]].
  *
  * <p> As of right now, [[codi.core.rules.ConstraintRule]] and [[codi.core.rules.BehaviourRule]] are not supported, i.e.
  * throw an [[UnsupportedOperationException]].
