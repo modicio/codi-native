@@ -16,10 +16,12 @@
 package codi.core
 
 import codi.core.rules._
+import codi.core.values.ConcreteValue
 
 /**
  * <p> The Base trait defines any class producing or forwarding a [[codi.core.Definition Definition]] compatible specification
  * of [[codi.core.Rule Rules]].
+ * <p> [[codi.core.values.ConcreteValue ConcreteValues]] are handled the same way as Rules internally.
  *
  * <p> As of right now, [[codi.core.rules.ConstraintRule]] and [[codi.core.rules.BehaviourRule]] are not supported, i.e.
  * throw an [[UnsupportedOperationException]].
@@ -46,6 +48,13 @@ trait Base {
    * @return Set[ExtensionRule]
    */
   def getExtensionRules: Set[ExtensionRule]
+
+  /**
+   * <p> Get all [[codi.core.values.ConcreteValue ConcreteValues]] of the target
+   *
+   * @return Set[ConcreteValue]
+   */
+  def getConcreteValues: Set[ConcreteValue]
 
   /**
    * <p>Get all [[codi.core.rules.ConstraintRule ConstraintRules]] of the target.

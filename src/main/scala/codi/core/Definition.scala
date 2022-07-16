@@ -17,6 +17,7 @@ package codi.core
 
 import codi.core.datamappings.RuleData
 import codi.core.rules._
+import codi.core.values.ConcreteValue
 import codi.util.Observable
 import codi.verification.DefinitionVerifier
 
@@ -45,12 +46,14 @@ final class Definition
   private val extensions: mutable.Set[ExtensionRule] = mutable.Set()
   private val associations: mutable.Set[AssociationRule] = mutable.Set()
 
+  private val values: mutable.Set[ConcreteValue] = mutable.Set()
+
   /**
    * <p> Get all [[codi.core.Rule Rules]] part of this Definition.
    *
    * @return Set[codi.core.Rule] - all Rules part of the Definition
    */
-  def getRules: Set[Rule] = Set.from(attributes ++ extensions ++ associations)
+  def getRules: Set[Rule] = Set.from(attributes ++ extensions ++ associations ++ values)
 
   /**
    * <p> Generates the set of [[codi.core.datamappings.RuleData RuleData]] which contains all [[codi.core.Rule Rules]] of
@@ -100,6 +103,7 @@ final class Definition
         case rule: AttributeRule => attributes.add(rule)
         case rule: ExtensionRule => extensions.add(rule)
         case rule: AssociationRule => associations.add(rule)
+        case rule: ConcreteValue => values.add(rule)
       }
       notifyObservers()
     }
@@ -124,6 +128,7 @@ final class Definition
         case rule: AttributeRule => attributes.remove(rule)
         case rule: ExtensionRule => extensions.remove(rule)
         case rule: AssociationRule => associations.remove(rule)
+        case rule: ConcreteValue => values.remove(rule)
       }
       notifyObservers()
     }
@@ -165,6 +170,14 @@ final class Definition
    * @return Set[ExtensionRule] - immutable set of all [[codi.core.rules.ExtensionRule ExtensionRules]]
    */
   override def getExtensionRules: Set[ExtensionRule] = Set.from(extensions)
+
+  /**
+   * <p> Get all [[codi.core.values.ConcreteValue ConcreteValues]] part of this Definition.
+   * <p> The provided result is deep-immutable and safe.
+   *
+   * @return Set[ConcreteValue] - immutable set of all [[codi.core.values.ConcreteValue ConcreteValues]]
+   */
+  override def getConcreteValues: Set[ConcreteValue] = Set.from(values)
 
   /**
    * <p> Not implemented yet. Returns an empty set always

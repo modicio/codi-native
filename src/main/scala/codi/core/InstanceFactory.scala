@@ -35,6 +35,10 @@ class InstanceFactory(definitionVerifier: DefinitionVerifier,
 
   def setRegistry(registry: Registry): Unit = this.registry = registry
 
+  //TODO consider VALUES
+
+  def newInstance(typeName: String, identity: String): Future[DeepInstance] = ???
+
   def newInstance(typeName: String): Future[DeepInstance] = {
     registry.getType(typeName, Fragment.REFERENCE_IDENTITY) flatMap (typeHandleOption =>
       typeHandleOption.getOrElse(throw new Exception("type-model not found")).unfold() flatMap (referenceTypeHandle => {

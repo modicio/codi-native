@@ -16,6 +16,7 @@
 package codi.nativelang.input
 
 import codi.core.rules.{AssociationRule, AttributeRule, ExtensionRule}
+import codi.core.values.ConcreteValue
 import codi.core.{Registry, Transformator}
 import codi.verification.{DefinitionVerifier, ModelVerifier}
 
@@ -44,12 +45,13 @@ class NativeInputTransformator(registry: Registry,
     val typeHandle = typeFactory.newType(name, identity, statement.template)
     registry.setType(typeHandle)
 
-    statement.childOf.foreach(extensionRule =>
-      typeHandle.applyRule(new ExtensionRule(extensionRule)))
-    statement.attributes.foreach(propertyRule =>
-      typeHandle.applyRule(new AttributeRule(propertyRule)))
-    statement.associations.foreach(associationRule =>
-      typeHandle.applyRule(new AssociationRule(associationRule)))
+    statement.childOf.foreach(extensionRule => typeHandle.applyRule(new ExtensionRule(extensionRule)))
+
+    statement.attributes.foreach(propertyRule => typeHandle.applyRule(new AttributeRule(propertyRule)))
+
+    statement.associations.foreach(associationRule => typeHandle.applyRule(new AssociationRule(associationRule)))
+
+    statement.values.foreach(concreteValue => typeHandle.applyRule(new ConcreteValue(concreteValue)))
   }
 
 }

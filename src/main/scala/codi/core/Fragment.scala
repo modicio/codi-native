@@ -16,7 +16,8 @@
 package codi.core
 
 import codi.core.datamappings.{FragmentData, RuleData}
-import codi.core.rules.AssociationRule
+import codi.core.rules.{AssociationRule, AttributeRule}
+import codi.core.values.ConcreteValue
 import codi.util.Observer
 import codi.verification.{DefinitionVerifier, ModelVerifier}
 
@@ -133,7 +134,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
    * @return Future[Unit] - after the operation terminates. The Fragment should not be accessed before this operation terminates.
    *         Exception in error cases.
    */
-  def unfold(): Future[Unit] = {
+  def unfold(): Future[Any] = {
     // resolve associations
     val associationRules: Set[AssociationRule] = definition.getAssociationRules
     if (associationRules.isEmpty) {
@@ -157,6 +158,42 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
    */
   def fold(): Unit = {
     associations.clear()
+  }
+
+  def isConcrete(): Boolean = {
+    //TODO check if every attribute and association with mult 1 has one final value
+    //val associationRules = get
+
+    
+
+  }
+
+  def hasSingleton: Future[Boolean] = {
+    registry.getType(name, Fragment.SINGLETON_IDENTITY) map (_.isDefined)
+  }
+
+  def toSingleton: Future[Option[DeepInstance]] = {
+    if (!isConcrete()) {
+      Future.successful(None)
+    } else {
+      updateSingleton()
+    }
+  }
+
+  def updateSingleton(): Future[Option[DeepInstance]] = {
+    removeSingleton() flatMap (_ => {
+      if (!isConcrete()) {
+        Future.successful(None)
+      } else {
+        val factory = new InstanceFactory(definitionVerifier.get, modelVerifier.get)
+        factory.setRegistry(registry)
+        factory.newInstance(name, Fragment.SINGLETON_IDENTITY) map (instance => Some(instance))
+      }
+    })
+  }
+
+  private def removeSingleton(): Future[Any] = {
+    registry.deleteTypeNoCascade(name, Fragment.SINGLETON_IDENTITY)
   }
 
   /**
@@ -266,6 +303,38 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
     results.toSet
   }
 
+  private[codi] def deepAttributeRuleSet: Set[AttributeRule] = {
+    val result = mutable.Set[AttributeRule]()
+    getParents.foreach(parent => result.addAll(parent.deepAttributeRuleSet))
+    result.addAll(definition.getAttributeRules)
+    result.toSet
+  }
+
+  private[codi] def deepAssociationRuleSet: Set[AssociationRule] = {
+    val result = mutable.Set[AssociationRule]()
+    getParents.foreach(parent => result.addAll(parent.deepAssociationRuleSet))
+    result.addAll(definition.getAssociationRules)
+    result.toSet
+  }
+
+  private[codi] def deepValueSet: Set[ConcreteValue] = {
+    val result = mutable.Set[ConcreteValue]()
+    //first add all values of this fragment
+    result.addAll(definition.getConcreteValues)
+    //get the values of all parents
+    getParents.map(parent => parent.deepValueSet).foreach(valueSet => {
+      valueSet.foreach(concreteValue => {
+        //only add the value of a parent if not already present
+        //this equals that child values overwrite parent values
+        val overrideOption = result.find(_.isEqual(concreteValue))
+        if(overrideOption.isEmpty){
+          result.add(concreteValue)
+        }
+      })
+    })
+    result.toSet
+  }
+
   /**
    * <p> Predefined query-method. Gets the set of [[codi.core.rules.AssociationRule AssociationRules]] part of the
    * [[codi.core.Definition Definition]] which target a certain other Fragment i.e. this method returns
@@ -330,4 +399,10 @@ object Fragment {
    * <p> The built-in constant string value used to represent reference identity Fragments.
    */
   val REFERENCE_IDENTITY = "#"
+
+  /**
+   * <p> The built-in constant string value used to represent singleton identities. I.e. objects/instances
+   * that can and must exist only once in a registry-context.
+   */
+  val SINGLETON_IDENTITY = "$"
 }

@@ -29,6 +29,8 @@ abstract class Registry(val typeFactory: TypeFactory, val instanceFactory: Insta
 
   def setType(typeHandle: TypeHandle): Future[Unit]
 
+  def deleteTypeNoCascade(name: String, SINGLETON_IDENTITY: String): Future[Any]
+
   def get(instanceId: String): Future[Option[DeepInstance]]
   def getAll(typeName: String): Future[Set[DeepInstance]]
 
