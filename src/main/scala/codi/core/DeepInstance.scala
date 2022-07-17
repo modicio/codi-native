@@ -396,3 +396,11 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
     }
   }
 }
+
+object DeepInstance {
+
+  def deriveSingletonInstanceId(fragmentName: String): String = {
+    Fragment.SINGLETON_IDENTITY + ":" + fragmentName
+  }
+
+}

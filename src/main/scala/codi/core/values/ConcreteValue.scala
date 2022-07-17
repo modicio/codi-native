@@ -16,6 +16,7 @@
 package codi.core.values
 
 import codi.core.Rule
+import codi.core.rules.{AssociationRule, AttributeRule}
 
 /**
  * TODO add documentation
@@ -44,6 +45,20 @@ class ConcreteValue(nativeValue: String) extends Rule(nativeValue) {
       new ConcreteAttribute(rawDescriptor)
     }else{
       new ConcreteAssociation(rawDescriptor)
+    }
+  }
+
+  def getAttributeDescriptor: ConcreteAttribute = {
+    valueDescriptor match {
+      case valueDescriptor: ConcreteAttribute => valueDescriptor
+      case _ => throw new UnsupportedOperationException()
+    }
+  }
+
+  def getAssociationDescriptor: ConcreteAssociation = {
+    valueDescriptor match {
+      case valueDescriptor: ConcreteAssociation => valueDescriptor
+      case _ => throw new UnsupportedOperationException()
     }
   }
 
@@ -86,8 +101,29 @@ class ConcreteValue(nativeValue: String) extends Rule(nativeValue) {
     ConcreteValue.create(valueType, valueName, valueDescriptor.toSeq, Some(Rule.UNKNOWN_ID))
 
 
+  /**
+   * TODO doc
+   * @param concreteValue
+   * @return
+   */
   def isPolymorphEqual(concreteValue: ConcreteValue): Boolean = {
     valueType == concreteValue.valueType && valueName == concreteValue.valueName
+  }
+
+  def concreteOf(rule: Rule): Boolean = {
+    rule match {
+      case rule: AttributeRule => matchesAttributeRule(rule)
+      case rule: AssociationRule => matchesAssociationRule(rule)
+      case _ => false
+    }
+  }
+
+  private def matchesAttributeRule(rule: AttributeRule): Boolean = {
+    rule.name == valueName
+  }
+
+  private def matchesAssociationRule(rule: AssociationRule): Boolean = {
+    rule.associationName == valueName
   }
 
 }
