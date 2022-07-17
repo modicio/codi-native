@@ -98,6 +98,21 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
    */
   override def fork(identity: String): Rule = AttributeRule.create(name, datatype, nonEmpty, Some(Rule.UNKNOWN_ID))
 
+  /**
+   * TODO doc
+   *
+   * @param rule
+   * @return
+   */
+  override def isPolymorphEqual(rule: Rule): Boolean = {
+    rule match {
+      case rule: AttributeRule => {
+        //TODO some sophisticated reasoning and verification must be made here!
+        rule.name == name && rule.datatype == datatype
+      }
+      case rule: _ => false
+    }
+  }
 }
 
 /**

@@ -98,6 +98,41 @@ class AssociationRule(nativeValue: String) extends Rule(nativeValue) {
    */
   override def fork(identity: String): Rule = AssociationRule.create(associationName, targetName, multiplicity, Some(Rule.UNKNOWN_ID))
 
+  /**
+   * TODO doc
+   *
+   * @param rule
+   * @return
+   */
+  override def isPolymorphEqual(rule: Rule): Boolean = {
+    rule match {
+      case rule: AssociationRule => {
+        //TODO some sophisticated reasoning must be made here!
+        // it has especially to be checked that the target is a child of the parent target
+        rule.associationName == associationName && rule.multiplicity == multiplicity && targetName == targetName
+      }
+      case rule: _ => false
+    }
+  }
+
+  /**
+   * TODO doc
+   * @return
+   */
+  def hasIntMultiplicity: Boolean = multiplicity.toIntOption.isDefined
+
+  /**
+   * TODO doc
+   * @return
+   */
+  def getIntMultiplicity: Int = {
+    if(!hasIntMultiplicity){
+      throw new UnsupportedOperationException("Cannot convert non-int multiplicity to int")
+    }else{
+      multiplicity.toIntOption.get
+    }
+  }
+
 }
 
 /**

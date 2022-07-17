@@ -160,12 +160,45 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
     associations.clear()
   }
 
-  def isConcrete(): Boolean = {
+  /**
+   * FIXME this is a dummy implementation and needs to be moved to a verification or reasoning module in the future.
+   *  No verification is done here, if a non-existent association is given, it will be accepted!
+   * @return
+   */
+  def isConcrete: Boolean = {
     //TODO check if every attribute and association with mult 1 has one final value
     //val associationRules = get
 
-    
+    val associationRules = deepAssociationRuleSet
+    val attributeRules = deepAttributeRuleSet
+    val values = deepValueSet
+    val associationValues = values.filter(_.isAssociationValue)
+    val attributeValues = values.filter(_.isAttributeValue)
 
+    var isConcrete: Boolean = true
+
+    //each association must have a fixed int-value multiplicity.
+    //the number of values fulfilling this association must match the multiplicity
+    associationRules.foreach(associationRule => {
+      val relation = associationRule.associationName
+      if(associationRule.hasIntMultiplicity){
+        val multiplicity = associationRule.getIntMultiplicity
+        if(associationValues.count(value => value.valueName == relation) != multiplicity){
+          isConcrete = false
+        }
+      }else{
+        isConcrete = false
+      }
+    })
+
+    //each attribute rule must be fulfilled by exactly one value
+    attributeRules.foreach(attributeRule => {
+      if(attributeValues.count(value => value.valueName == attributeRule.name) != 1){
+        isConcrete = false
+      }
+    })
+    
+    isConcrete
   }
 
   def hasSingleton: Future[Boolean] = {
@@ -173,7 +206,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   }
 
   def toSingleton: Future[Option[DeepInstance]] = {
-    if (!isConcrete()) {
+    if (!isConcrete) {
       Future.successful(None)
     } else {
       updateSingleton()
@@ -182,7 +215,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
 
   def updateSingleton(): Future[Option[DeepInstance]] = {
     removeSingleton() flatMap (_ => {
-      if (!isConcrete()) {
+      if (!isConcrete) {
         Future.successful(None)
       } else {
         val factory = new InstanceFactory(definitionVerifier.get, modelVerifier.get)
@@ -247,12 +280,11 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   /**
    * <p> Private observer object representing a callback that is called if the [[codi.core.Definition Definition]]
    * changes.
-   * <p> TODO this is unused as of right now
    */
   private final object _definitionObserver extends Observer {
     override def onChange(): Future[Unit] = {
       //TODO commit here if in some kind of automatic mode
-      Future.successful()
+      updateSingleton() flatMap (_ => Future.successful())
     }
   }
 
@@ -305,34 +337,34 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
 
   private[codi] def deepAttributeRuleSet: Set[AttributeRule] = {
     val result = mutable.Set[AttributeRule]()
-    getParents.foreach(parent => result.addAll(parent.deepAttributeRuleSet))
     result.addAll(definition.getAttributeRules)
+    applyDeepResult[AttributeRule](result, getParents.map(parent => parent.deepAttributeRuleSet))
     result.toSet
   }
 
   private[codi] def deepAssociationRuleSet: Set[AssociationRule] = {
     val result = mutable.Set[AssociationRule]()
-    getParents.foreach(parent => result.addAll(parent.deepAssociationRuleSet))
     result.addAll(definition.getAssociationRules)
+    applyDeepResult[AssociationRule](result, getParents.map(parent => parent.deepAssociationRuleSet))
     result.toSet
   }
 
   private[codi] def deepValueSet: Set[ConcreteValue] = {
     val result = mutable.Set[ConcreteValue]()
-    //first add all values of this fragment
     result.addAll(definition.getConcreteValues)
-    //get the values of all parents
-    getParents.map(parent => parent.deepValueSet).foreach(valueSet => {
-      valueSet.foreach(concreteValue => {
-        //only add the value of a parent if not already present
-        //this equals that child values overwrite parent values
-        val overrideOption = result.find(_.isEqual(concreteValue))
-        if(overrideOption.isEmpty){
-          result.add(concreteValue)
+    applyDeepResult[ConcreteValue](result, getParents.map(parent => parent.deepValueSet))
+    result.toSet
+  }
+
+  private def applyDeepResult[T <: Rule](result: mutable.Set[T], values: Set[Set[T]]): Unit = {
+    values.foreach(ruleSet => {
+      ruleSet.foreach(associationRule => {
+        val overrideOption = result.find(_.isPolymorphEqual(associationRule))
+        if (overrideOption.isEmpty) {
+          result.add(associationRule)
         }
       })
     })
-    result.toSet
   }
 
   /**

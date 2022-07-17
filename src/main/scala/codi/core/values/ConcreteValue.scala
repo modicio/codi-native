@@ -86,7 +86,7 @@ class ConcreteValue(nativeValue: String) extends Rule(nativeValue) {
     ConcreteValue.create(valueType, valueName, valueDescriptor.toSeq, Some(Rule.UNKNOWN_ID))
 
 
-  def isEqual(concreteValue: ConcreteValue): Boolean = {
+  def isPolymorphEqual(concreteValue: ConcreteValue): Boolean = {
     valueType == concreteValue.valueType && valueName == concreteValue.valueName
   }
 
