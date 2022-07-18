@@ -399,8 +399,22 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
 
 object DeepInstance {
 
-  def deriveSingletonInstanceId(fragmentName: String): String = {
-    Fragment.SINGLETON_IDENTITY + ":" + fragmentName
+  def deriveSingletonInstanceId(identity: String, fragmentName: String): String = {
+    identity + ":" + fragmentName
+  }
+
+  def isSingletonInstanceId(instanceId: String): Boolean = {
+    instanceId.startsWith("$")
+  }
+
+  def isSingletonRoot(instanceIdPrefix: String): Boolean = {
+    isSingletonInstanceId(instanceIdPrefix) &&
+      instanceIdPrefix.split("_").length > 1 &&
+      instanceIdPrefix.split(":").length == 1
+  }
+
+  def deriveRootSingletonInstanceId(fragmentName: String): String = {
+    Fragment.composeSingletonIdentity(fragmentName) + ":" + fragmentName
   }
 
 }

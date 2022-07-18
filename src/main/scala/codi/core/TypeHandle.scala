@@ -35,6 +35,14 @@ class TypeHandle(private[core] val fragment: Fragment, val static: Boolean) {
 
   def getIsTemplate: Boolean = fragment.isTemplate
 
+  def isConcrete: Boolean = fragment.isConcrete
+
+  def hasSingleton: Future[Boolean] = fragment.hasSingleton
+
+  def hasSingletonRoot: Future[Boolean] = fragment.hasSingletonRoot
+
+  def updateSingletonRoot(): Future[Any] = fragment.updateSingletonRoot()
+
   private[codi] def getFragment: Fragment = fragment
 
   def unfold(): Future[TypeHandle] = fragment.unfold() map (_ => this)

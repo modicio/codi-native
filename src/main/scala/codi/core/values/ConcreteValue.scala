@@ -37,7 +37,7 @@ class ConcreteValue(nativeValue: String) extends Rule(nativeValue) {
 
   private def parseType: String = nativeValue.split(":")(1)
 
-  private def parseName: String = nativeValue.split(":")(2)
+  private def parseName: String = nativeValue.split(":")(2).split("\\(")(0)
 
   private def parseDescriptor: ValueDescriptor = {
     val rawDescriptor = "(" + nativeValue.split("\\(")(1)
@@ -131,7 +131,7 @@ class ConcreteValue(nativeValue: String) extends Rule(nativeValue) {
 object ConcreteValue {
 
   val ATTRIBUTE_VALUE = "ATTRIBUTE"
-  val ASSOCIATION_VALUE = "ASSOCIATION"
+  val ASSOCIATION_VALUE = "LINK"
 
   /**
    * TODO add documentation

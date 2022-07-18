@@ -15,6 +15,7 @@
  */
 package codi.core
 
+import codi.core.Fragment.composeSingletonIdentity
 import codi.core.datamappings.{FragmentData, RuleData}
 import codi.core.rules.{AssociationRule, AttributeRule}
 import codi.core.values.ConcreteValue
@@ -47,6 +48,17 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   protected final var definitionVerifier: Option[DefinitionVerifier] = None
 
   private[core] val associations: mutable.Set[TypeHandle] = mutable.Set()
+
+  /**
+   * <p> Private observer object representing a callback that is called if the [[codi.core.Definition Definition]]
+   * changes.
+   */
+  private final object _definitionObserver extends Observer {
+    override def onChange(): Future[Unit] = {
+      //TODO commit here if in some kind of automatic mode
+      Future.successful()
+    }
+  }
 
   /**
    * <p>Abstract method to get if the concrete implementation is a [[codi.core.Node Node]]. It must be a
@@ -135,6 +147,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
    *         Exception in error cases.
    */
   def unfold(): Future[Any] = {
+    associations.clear()
     // resolve associations
     val associationRules: Set[AssociationRule] = definition.getAssociationRules
     if (associationRules.isEmpty) {
@@ -197,36 +210,32 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
         isConcrete = false
       }
     })
-    
+    println("DEBUG >> " + name + " isConcrete = " + isConcrete)
     isConcrete
   }
 
   def hasSingleton: Future[Boolean] = {
-    registry.getType(name, Fragment.SINGLETON_IDENTITY) map (_.isDefined)
+    registry.getSingletonTypes(name) map(_.nonEmpty)
   }
 
-  def toSingleton: Future[Option[DeepInstance]] = {
-    if (!isConcrete) {
-      Future.successful(None)
-    } else {
-      updateSingleton()
-    }
+  def hasSingletonRoot: Future[Boolean] = {
+    registry.getType(name, composeSingletonIdentity(name)) map (_.isDefined)
   }
 
-  def updateSingleton(): Future[Option[DeepInstance]] = {
-    removeSingleton() flatMap (_ => {
+  def updateSingletonRoot(): Future[Option[DeepInstance]] = {
+    unfold() flatMap (_ => removeSingleton() flatMap (_ => {
       if (!isConcrete) {
         Future.successful(None)
       } else {
         val factory = new InstanceFactory(definitionVerifier.get, modelVerifier.get)
         factory.setRegistry(registry)
-        factory.newInstance(name, Fragment.SINGLETON_IDENTITY) map (instance => Some(instance))
+        factory.newInstance(name, Fragment.composeSingletonIdentity(name)) map (instance => Some(instance))
       }
-    })
+    }))
   }
 
   private def removeSingleton(): Future[Any] = {
-    registry.deleteTypeNoCascade(name, Fragment.SINGLETON_IDENTITY)
+    registry.deleteTypeNoCascade(name, Fragment.composeSingletonIdentity(name))
   }
 
   /**
@@ -276,17 +285,6 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
    * @return Definition if available or Exception
    */
   protected def getDefinition: Definition = definition
-
-  /**
-   * <p> Private observer object representing a callback that is called if the [[codi.core.Definition Definition]]
-   * changes.
-   */
-  private final object _definitionObserver extends Observer {
-    override def onChange(): Future[Unit] = {
-      //TODO commit here if in some kind of automatic mode
-      updateSingleton() flatMap (_ => Future.successful())
-    }
-  }
 
   /**
    * <p> Package-private setter for [[codi.core.Registry Registry]].
@@ -437,4 +435,13 @@ object Fragment {
    * that can and must exist only once in a registry-context.
    */
   val SINGLETON_IDENTITY = "$"
+
+  def composeSingletonIdentity(typeName: String): String = SINGLETON_IDENTITY + "_" + typeName
+
+  def decomposeSingletonIdentity(identity: String): String = {
+    identity.split("_")(1)
+  }
+
+  def isSingletonIdentity(identity: String): Boolean = identity.startsWith(SINGLETON_IDENTITY)
+
 }

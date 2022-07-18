@@ -26,6 +26,7 @@ abstract class Registry(val typeFactory: TypeFactory, val instanceFactory: Insta
 
   def getType(name: String, identity: String): Future[Option[TypeHandle]]
   def getReferences: Future[Set[TypeHandle]]
+  def getSingletonTypes(name: String): Future[Set[TypeHandle]]
 
   def setType(typeHandle: TypeHandle): Future[Unit]
 

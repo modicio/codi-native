@@ -89,8 +89,8 @@ class InstanceFactory(definitionVerifier: DefinitionVerifier,
                              deepValueSet: Set[ConcreteValue],
                              instanceBuffer: mutable.Set[DeepInstance]): DeepInstance = {
     val instanceId: String = {
-      if(identity == Fragment.SINGLETON_IDENTITY){
-        DeepInstance.deriveSingletonInstanceId(typeHandle.getTypeName)
+      if(Fragment.isSingletonIdentity(identity)){
+        DeepInstance.deriveSingletonInstanceId(identity, typeHandle.getTypeName)
       }else{
         Identity.create()
       }
@@ -143,7 +143,7 @@ class InstanceFactory(definitionVerifier: DefinitionVerifier,
         val concreteAssociation = value.getAssociationDescriptor
         val target = concreteAssociation.targetFragment
         //val targetIdentity = concreteAssociation.targetIdentity // we assume only singleton identities here!
-        result.add(AssociationData(0, relationName, instanceId, DeepInstance.deriveSingletonInstanceId(target), isFinal = true))
+        result.add(AssociationData(0, relationName, instanceId, DeepInstance.deriveRootSingletonInstanceId(target), isFinal = true))
       })
     })
     result.toSet
