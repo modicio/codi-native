@@ -22,7 +22,7 @@ import scala.concurrent.Future
 
 /**
  * TODO documentation
- *
+ * @note experimental feature - not fully supported yet
  * @param typeFactory
  * @param instanceFactory
  */
@@ -90,5 +90,5 @@ abstract class AbstractPersistentRegistry(typeFactory: TypeFactory, instanceFact
 
   override def setInstance(deepInstance: DeepInstance): Future[Unit] = ???
 
-
+  override def deleteTypeNoCascade(name: String, SINGLETON_IDENTITY: String): Future[Any] = ???
 }

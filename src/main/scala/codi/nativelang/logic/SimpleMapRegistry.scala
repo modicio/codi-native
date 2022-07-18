@@ -70,4 +70,20 @@ class SimpleMapRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFacto
     Future.successful(instanceRegistry.addOne(deepInstance.getInstanceId, deepInstance))
   }
 
+  override def deleteTypeNoCascade(name: String, identity: String): Future[Any] = {
+
+    if(identity == Fragment.REFERENCE_IDENTITY){
+      val typeGroupOption = typeRegistry.get(name)
+      if(typeGroupOption.isDefined){
+        Future.successful(typeGroupOption.get.remove(identity))
+      }else{
+        Future.failed(new IllegalArgumentException())
+      }
+    }else if(identity == Fragment.SINGLETON_IDENTITY){
+      val singletonInstanceId = DeepInstance.deriveSingletonInstanceId(name)
+      Future.successful(instanceRegistry.remove(singletonInstanceId))
+    }else{
+      Future.failed(new IllegalArgumentException())
+    }
+  }
 }

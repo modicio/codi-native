@@ -110,7 +110,7 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
         //TODO some sophisticated reasoning and verification must be made here!
         rule.name == name && rule.datatype == datatype
       }
-      case rule: _ => false
+      case _ => false
     }
   }
 }
