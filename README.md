@@ -14,7 +14,7 @@ In its current version, this framework is realisised as a prototypical implement
 ## release notes
 
 * [0.1.1](https://github.com/modicio/codi-native/releases/tag/0.1.1) contains the version used to execute the experiment/user-study of Karl Kegel's master thesis linked below.
-* [0.1.2]() contains the version following our MULTI 2022 submission. This adds:        
+* [0.1.2](https://github.com/modicio/codi-native/releases/tag/0.1.2) contains the version following our MULTI 2022 submission. This adds:        
    * Modelling of model-space instance values
    * Creation of singleton-instances
 
