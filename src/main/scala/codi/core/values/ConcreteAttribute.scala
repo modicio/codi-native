@@ -16,7 +16,6 @@
 package codi.core.values
 
 /**
- * TODO add documentation
  * @param nativeValue
  */
 class ConcreteAttribute(nativeValue: String) extends ValueDescriptor(nativeValue) {

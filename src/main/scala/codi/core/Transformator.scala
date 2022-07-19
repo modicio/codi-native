@@ -19,13 +19,6 @@ import codi.verification.{DefinitionVerifier, ModelVerifier}
 
 import scala.concurrent.Future
 
-/**
- * TODO documentation
- * @param registry
- * @param definitionVerifier
- * @param modelVerifier
- * @tparam T
- */
 abstract class Transformator[T](protected val registry: Registry,
                                 protected val definitionVerifier: DefinitionVerifier,
                                 protected val modelVerifier: ModelVerifier) {

@@ -21,12 +21,6 @@ import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-/**
- * TODO documentation
- *
- * @param typeFactory
- * @param instanceFactory
- */
 class SimpleMapRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFactory)
   extends Registry(typeFactory, instanceFactory) {
 

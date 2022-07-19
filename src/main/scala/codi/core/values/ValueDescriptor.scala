@@ -16,7 +16,6 @@
 package codi.core.values
 
 /**
- * TODO add documentation
  * @param nativeValue
  */
 abstract class ValueDescriptor(val nativeValue: String) {
@@ -33,9 +32,6 @@ abstract class ValueDescriptor(val nativeValue: String) {
 
 }
 
-/**
- * TODO add documentation
- */
 object ValueDescriptor {
 
   def fromSeq(elements: Seq[String]): String = {

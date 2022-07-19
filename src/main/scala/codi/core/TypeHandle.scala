@@ -18,11 +18,7 @@ package codi.core
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-/**
- * TODO documentation
- * @param fragment
- * @param static
- */
+
 class TypeHandle(private[core] val fragment: Fragment, val static: Boolean) {
 
   def isValid: Boolean = fragment.isValid

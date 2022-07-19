@@ -18,9 +18,6 @@ package codi.nativelang.logic
 import codi.core.Rule
 import codi.verification.DefinitionVerifier
 
-/**
- * TODO documentation
- */
 class SimpleDefinitionVerifier extends DefinitionVerifier {
 
   override def verify(rules: Set[Rule]): Boolean = true

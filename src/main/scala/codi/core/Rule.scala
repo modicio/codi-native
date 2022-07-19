@@ -92,11 +92,6 @@ abstract class Rule(protected val nativeValue: String) {
     }
   }
 
-  /**
-   * TODO doc
-   * @param rule
-   * @return
-   */
   def isPolymorphEqual(rule: Rule): Boolean = ???
 
 }

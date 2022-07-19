@@ -15,8 +15,4 @@
  */
 package codi.nativelang.input
 
-/**
- * TODO documentation
- * @param model
- */
 case class NativeInput(model: Seq[Statement])

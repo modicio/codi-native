@@ -20,12 +20,6 @@ import codi.core._
 
 import scala.concurrent.Future
 
-/**
- * TODO documentation
- * @note experimental feature - not fully supported yet
- * @param typeFactory
- * @param instanceFactory
- */
 abstract class AbstractPersistentRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFactory)
   extends Registry(typeFactory, instanceFactory) {
 

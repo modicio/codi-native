@@ -19,7 +19,6 @@ import codi.core.Rule
 import codi.core.rules.{AssociationRule, AttributeRule}
 
 /**
- * TODO add documentation
  * @param nativeValue he string representation in the native-language format
  */
 class ConcreteValue(nativeValue: String) extends Rule(nativeValue) {

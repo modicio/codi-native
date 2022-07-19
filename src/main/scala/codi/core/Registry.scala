@@ -18,7 +18,6 @@ package codi.core
 import scala.concurrent.Future
 
 /**
- * TODO documentation
  * @param typeFactory
  * @param instanceFactory
  */

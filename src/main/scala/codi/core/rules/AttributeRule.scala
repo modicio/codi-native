@@ -99,7 +99,6 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
   override def fork(identity: String): Rule = AttributeRule.create(name, datatype, nonEmpty, Some(Rule.UNKNOWN_ID))
 
   /**
-   * TODO doc
    *
    * @param rule
    * @return

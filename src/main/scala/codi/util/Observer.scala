@@ -17,9 +17,6 @@ package codi.util
 
 import scala.concurrent.Future
 
-/**
- * TODO documentation
- */
 trait Observer {
   def onChange(): Future[Unit]
 }

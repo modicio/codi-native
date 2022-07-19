@@ -20,7 +20,6 @@ import codi.core.datamappings.{AssociationData, AttributeData, ExtensionData}
 import scala.collection.mutable
 
 /**
- * TODO documentation
  * @param attributes
  * @param associations
  * @param extensions

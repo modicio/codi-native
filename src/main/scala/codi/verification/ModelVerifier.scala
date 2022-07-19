@@ -17,9 +17,6 @@ package codi.verification
 
 import codi.core.TypeHandle
 
-/**
- * TODO add documentation
- */
 trait ModelVerifier {
 
   def verify(typeHandle: TypeHandle): Boolean

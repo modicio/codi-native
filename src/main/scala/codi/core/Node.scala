@@ -22,7 +22,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
- * TODO documentation
  * @param name       name of the Fragment, name and identity form a unique pair.
  * @param identity   identity of the Fragment
  * @param isTemplate if the template can be instantiated directly or only used as part of an extension hierarchy / isAbstract
