@@ -19,7 +19,6 @@ import codi.core.datamappings.{FragmentData, RuleData}
 import codi.verification.{DefinitionVerifier, ModelVerifier}
 
 /**
- * TODO documentation
  * @param definitionVerifier
  * @param modelVerifier
  */

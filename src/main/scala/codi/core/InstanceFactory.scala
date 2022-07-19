@@ -25,8 +25,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
- * TODO documentation
- *
  * @param definitionVerifier
  * @param modelVerifier
  */
@@ -149,8 +147,7 @@ class InstanceFactory(definitionVerifier: DefinitionVerifier,
     result.toSet
   }
 
-  //TODO construct Instance from a lot of stuff here ###################################################################
-  // not so much in particular...
+  //TODO construct Instance from a lot of stuff here #
   // extensions do not need to be considered :D, they are loaded only on unfold
   def loadInstance(instanceData: InstanceData, configuration: Shape, typeHandle: TypeHandle): DeepInstance = ???
 

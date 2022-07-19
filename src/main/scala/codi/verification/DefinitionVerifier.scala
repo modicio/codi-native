@@ -17,9 +17,6 @@ package codi.verification
 
 import codi.core.Rule
 
-/**
- * TODO documentation
- */
 trait DefinitionVerifier {
 
   def verify(rules: Set[Rule]): Boolean

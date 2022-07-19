@@ -99,7 +99,6 @@ class AssociationRule(nativeValue: String) extends Rule(nativeValue) {
   override def fork(identity: String): Rule = AssociationRule.create(associationName, targetName, multiplicity, Some(Rule.UNKNOWN_ID))
 
   /**
-   * TODO doc
    *
    * @param rule
    * @return
@@ -116,13 +115,13 @@ class AssociationRule(nativeValue: String) extends Rule(nativeValue) {
   }
 
   /**
-   * TODO doc
+   *
    * @return
    */
   def hasIntMultiplicity: Boolean = multiplicity.toIntOption.isDefined
 
   /**
-   * TODO doc
+   *
    * @return
    */
   def getIntMultiplicity: Int = {

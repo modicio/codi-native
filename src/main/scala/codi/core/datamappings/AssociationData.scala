@@ -23,5 +23,6 @@ package codi.core.datamappings
  * @param byRelation       name of the relation given by the corresponding [[codi.core.rules.AssociationRule AssociationRule]]
  * @param instanceId       id of the [[codi.core.DeepInstance DeepInstance]] this association is starting
  * @param targetInstanceId id of the [[codi.core.DeepInstance DeepInstance]] this association is pointing at
+ * @param isFinal
  */
 case class AssociationData(id: Long, byRelation: String, instanceId: String, targetInstanceId: String, isFinal: Boolean)

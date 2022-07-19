@@ -182,16 +182,12 @@ final class Definition
   /**
    * <p> Not implemented yet. Returns an empty set always
    *
-   * TODO
-   *
    * @return Set[ConstraintRule] - empty set
    */
   override def getConstraintRules: Set[ConstraintRule] = Set()
 
   /**
    * <p> Not implemented yet. Returns an empty set always
-   *
-   * TODO
    *
    * @return Set[BehaviourRule] - empty set
    */

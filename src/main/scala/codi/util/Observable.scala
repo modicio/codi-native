@@ -17,9 +17,6 @@ package codi.util
 
 import scala.collection.mutable.ListBuffer
 
-/**
- * TODO documentation
- */
 trait Observable {
 
   protected val observers: ListBuffer[Observer] = ListBuffer()

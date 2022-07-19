@@ -16,7 +16,6 @@
 package codi.core.values
 
 /**
- * TODO add documentation
  * @param nativeValue
  */
 class ConcreteAssociation(nativeValue: String) extends ValueDescriptor(nativeValue) {

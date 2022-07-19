@@ -17,10 +17,6 @@ package codi.core
 
 import scala.collection.mutable.ListBuffer
 
-/**
- * TODO documentation
- * @param initialFragment
- */
 class TypeIterator(private val initialFragment: Fragment) {
 
   private val _currentBuffer: ListBuffer[Fragment] = ListBuffer(initialFragment)

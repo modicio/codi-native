@@ -17,9 +17,6 @@ package codi.util
 
 import java.util.UUID
 
-/**
- * TODO documentation
- */
 object Identity {
 
   def create(): String = UUID.randomUUID().toString

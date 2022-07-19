@@ -23,8 +23,6 @@ import codi.verification.{DefinitionVerifier, ModelVerifier}
 import scala.concurrent.Future
 
 /**
- * TODO documentation
- *
  * @param registry
  * @param definitionVerifier
  * @param modelVerifier

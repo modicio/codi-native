@@ -16,8 +16,6 @@
 package codi.nativelang.input
 
 /**
- * TODO documentation
- *
  * @param name
  * @param template
  * @param childOf

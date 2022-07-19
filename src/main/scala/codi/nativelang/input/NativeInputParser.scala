@@ -18,9 +18,6 @@ package codi.nativelang.input
 import io.circe.parser
 import io.circe.generic.auto._
 
-/**
- * TODO documentation
- */
 object NativeInputParser {
 
   def parse(nativeInput: String): NativeInput = {

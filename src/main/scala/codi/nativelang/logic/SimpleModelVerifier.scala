@@ -18,9 +18,6 @@ package codi.nativelang.logic
 import codi.core.TypeHandle
 import codi.verification.ModelVerifier
 
-/**
- * TODO documentation
- */
 class SimpleModelVerifier extends ModelVerifier {
 
   override def verify(typeHandle: TypeHandle): Boolean = true
