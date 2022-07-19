@@ -23,5 +23,6 @@ package codi.core.datamappings
  * @param instanceId id of the [[codi.core.DeepInstance DeepInstance]] this attribute is part of
  * @param key        name of the attribute specified by the corresponding [[codi.core.rules.AttributeRule AttributeRule]]
  * @param value      value of the attribute serialised as String. This value is mutable explicitly!
+ * @param isFinal    if the attribute is part of the model specification and is conceptual immutable
  */
-case class AttributeData(id: Long, instanceId: String, key: String, var value: String)
+case class AttributeData(id: Long, instanceId: String, key: String, var value: String, isFinal: Boolean)

@@ -15,6 +15,8 @@
  */
 package codi.core.rules
 
+import codi.core.Rule
+
 /**
  * TODO this rule is not implemented yet and serves only as conceptual placeholder
  * This feature is on the release Roadmap for a future version, an issue may be introduced.

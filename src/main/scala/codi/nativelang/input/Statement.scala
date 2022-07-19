@@ -23,8 +23,14 @@ package codi.nativelang.input
  * @param childOf
  * @param associations
  * @param attributes
+ * @param values
  */
-case class Statement(name: String, template: Boolean, childOf: Seq[String], associations: Seq[String], attributes: Seq[String])
+case class Statement(name: String,
+                     template: Boolean,
+                     childOf: Seq[String],
+                     associations: Seq[String],
+                     attributes: Seq[String],
+                     values: Seq[String])
 
 /**
  * TODO documentation

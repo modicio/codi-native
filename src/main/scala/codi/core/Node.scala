@@ -16,7 +16,6 @@
 package codi.core
 
 import codi.core.datamappings.{FragmentData, RuleData}
-import codi.core.rules.Rule
 
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global

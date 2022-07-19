@@ -24,4 +24,4 @@ package codi.core.datamappings
  * @param instanceId       id of the [[codi.core.DeepInstance DeepInstance]] this association is starting
  * @param targetInstanceId id of the [[codi.core.DeepInstance DeepInstance]] this association is pointing at
  */
-case class AssociationData(id: Long, byRelation: String, instanceId: String, targetInstanceId: String)
+case class AssociationData(id: Long, byRelation: String, instanceId: String, targetInstanceId: String, isFinal: Boolean)

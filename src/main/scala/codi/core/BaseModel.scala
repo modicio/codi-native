@@ -16,7 +16,7 @@
 package codi.core
 
 import codi.core.datamappings.{FragmentData, RuleData}
-import codi.core.rules.{ExtensionRule, Rule}
+import codi.core.rules.ExtensionRule
 import codi.verification.DefinitionVerifier
 
 import scala.concurrent.Future
@@ -95,7 +95,7 @@ abstract class BaseModel(name: String, identity: String, isTemplate: Boolean) ex
    * <p>Concrete final implementation of [[codi.core.Fragment#applyRule Fragment#applyRule()]].
    * <p>This operation is forbidden in BaseModel an throws an according Exception.
    *
-   * @param rule the [[codi.core.rules.Rule Rule]] to apply
+   * @param rule the [[codi.core.Rule Rule]] to apply
    */
   override final def applyRule(rule: Rule): Unit = {
     throw new Exception("forbidden: unable to apply rule to base model")
@@ -105,7 +105,7 @@ abstract class BaseModel(name: String, identity: String, isTemplate: Boolean) ex
    * <p>Concrete final implementation of [[codi.core.Fragment#removeRule Fragment#removeRule()]].
    * <p>This operation is forbidden in BaseModel an throws an according Exception.
    *
-   * @param rule the [[codi.core.rules.Rule Rule]] to remove
+   * @param rule the [[codi.core.Rule Rule]] to remove
    */
   override final def removeRule(rule: Rule): Unit = {
     throw new Exception("forbidden: unable to remove rule from base model")

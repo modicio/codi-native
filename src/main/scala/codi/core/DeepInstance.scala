@@ -386,7 +386,7 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
       //check if the proposed relation is defined on top of a type which is in the instance type hierarchy
       val allowedAssociationTypes = typeHandle.getFragment.getDeepAssociationRulesOfRelation(byRelation).map(_.targetName)
       if (instanceTypes.intersect(allowedAssociationTypes).nonEmpty) {
-        shape.addAssociation(AssociationData(0, byRelation, instanceId, deepInstance.getPolymorphSubtype(associateAs).get.getInstanceId))
+        shape.addAssociation(AssociationData(0, byRelation, instanceId, deepInstance.getPolymorphSubtype(associateAs).get.getInstanceId, isFinal = false))
         true
       } else {
         throw new Exception("The allowed association types does not contain the given type or the instance does not intersect with the given type")
@@ -395,4 +395,26 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
       throw new Exception("The proposed relation is not defined on top of a type which is in the instance type hierarchy")
     }
   }
+}
+
+object DeepInstance {
+
+  def deriveSingletonInstanceId(identity: String, fragmentName: String): String = {
+    identity + ":" + fragmentName
+  }
+
+  def isSingletonInstanceId(instanceId: String): Boolean = {
+    instanceId.startsWith("$")
+  }
+
+  def isSingletonRoot(instanceIdPrefix: String): Boolean = {
+    isSingletonInstanceId(instanceIdPrefix) &&
+      instanceIdPrefix.split("_").length > 1 &&
+      instanceIdPrefix.split(":").length == 1
+  }
+
+  def deriveRootSingletonInstanceId(fragmentName: String): String = {
+    Fragment.composeSingletonIdentity(fragmentName) + ":" + fragmentName
+  }
+
 }

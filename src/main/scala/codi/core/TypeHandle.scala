@@ -15,8 +15,6 @@
  */
 package codi.core
 
-import codi.core.rules.Rule
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -36,6 +34,14 @@ class TypeHandle(private[core] val fragment: Fragment, val static: Boolean) {
   def getIsStatic: Boolean = static
 
   def getIsTemplate: Boolean = fragment.isTemplate
+
+  def isConcrete: Boolean = fragment.isConcrete
+
+  def hasSingleton: Future[Boolean] = fragment.hasSingleton
+
+  def hasSingletonRoot: Future[Boolean] = fragment.hasSingletonRoot
+
+  def updateSingletonRoot(): Future[Any] = fragment.updateSingletonRoot()
 
   private[codi] def getFragment: Fragment = fragment
 

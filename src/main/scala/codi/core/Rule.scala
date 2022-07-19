@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package codi.core.rules
+package codi.core
 
 import codi.util.Identity
 
@@ -77,7 +77,7 @@ abstract class Rule(protected val nativeValue: String) {
 
   /**
    * <p>Helper to parse the id of the Rule from its serialised representation
-   * <p>If no id is specified, i.e. the serialisation starts with ":". the [[codi.core.rules.Rule#UNKNOWN_ID UNKNOWN_ID]]
+   * <p>If no id is specified, i.e. the serialisation starts with ":". the [[codi.core.Rule#UNKNOWN_ID UNKNOWN_ID]]
    * is returned instead.
    *
    * @param nativeValue serialised rule representation
@@ -91,12 +91,20 @@ abstract class Rule(protected val nativeValue: String) {
       Rule.UNKNOWN_ID
     }
   }
+
+  /**
+   * TODO doc
+   * @param rule
+   * @return
+   */
+  def isPolymorphEqual(rule: Rule): Boolean = ???
+
 }
 
 /**
  * Rule companion object containing static constants and setting for Rule classes in a specific runtime context.
  *
- * @see [[codi.core.rules.Rule]]
+ * @see [[codi.core.Rule]]
  */
 object Rule {
 

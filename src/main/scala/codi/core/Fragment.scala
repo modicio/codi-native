@@ -15,8 +15,10 @@
  */
 package codi.core
 
+import codi.core.Fragment.composeSingletonIdentity
 import codi.core.datamappings.{FragmentData, RuleData}
-import codi.core.rules.{AssociationRule, Rule}
+import codi.core.rules.{AssociationRule, AttributeRule}
+import codi.core.values.ConcreteValue
 import codi.util.Observer
 import codi.verification.{DefinitionVerifier, ModelVerifier}
 
@@ -48,6 +50,17 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   private[core] val associations: mutable.Set[TypeHandle] = mutable.Set()
 
   /**
+   * <p> Private observer object representing a callback that is called if the [[codi.core.Definition Definition]]
+   * changes.
+   */
+  private final object _definitionObserver extends Observer {
+    override def onChange(): Future[Unit] = {
+      //TODO commit here if in some kind of automatic mode
+      Future.successful()
+    }
+  }
+
+  /**
    * <p>Abstract method to get if the concrete implementation is a [[codi.core.Node Node]]. It must be a
    * [[codi.core.BaseModel BaseModel]] otherwise.
    *
@@ -65,7 +78,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   def getParents: Set[Fragment]
 
   /**
-   * <p> Add a [[codi.core.rules.Rule Rule]] to this Fragment.
+   * <p> Add a [[codi.core.Rule Rule]] to this Fragment.
    * <p> See the concrete implementations for more information.
    * <p> A concrete implementation may require the Fragment to be unfolded!
    * <p> A concrete implementation may change the fold state of the Fragment
@@ -75,7 +88,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   def applyRule(rule: Rule): Unit
 
   /**
-   * <p> Remove a [[codi.core.rules.Rule Rule]] from this Fragment.
+   * <p> Remove a [[codi.core.Rule Rule]] from this Fragment.
    * <p> See the concrete implementations for more information.
    * <p> A concrete implementation may require the Fragment to be unfolded!
    * <p> A concrete implementation may change the fold state of the Fragment
@@ -133,7 +146,8 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
    * @return Future[Unit] - after the operation terminates. The Fragment should not be accessed before this operation terminates.
    *         Exception in error cases.
    */
-  def unfold(): Future[Unit] = {
+  def unfold(): Future[Any] = {
+    associations.clear()
     // resolve associations
     val associationRules: Set[AssociationRule] = definition.getAssociationRules
     if (associationRules.isEmpty) {
@@ -157,6 +171,71 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
    */
   def fold(): Unit = {
     associations.clear()
+  }
+
+  /**
+   * FIXME this is a dummy implementation and needs to be moved to a verification or reasoning module in the future.
+   *  No verification is done here, if a non-existent association is given, it will be accepted!
+   * @return
+   */
+  def isConcrete: Boolean = {
+    //TODO check if every attribute and association with mult 1 has one final value
+    //val associationRules = get
+
+    val associationRules = deepAssociationRuleSet
+    val attributeRules = deepAttributeRuleSet
+    val values = deepValueSet
+    val associationValues = values.filter(_.isAssociationValue)
+    val attributeValues = values.filter(_.isAttributeValue)
+
+    var isConcrete: Boolean = true
+
+    //each association must have a fixed int-value multiplicity.
+    //the number of values fulfilling this association must match the multiplicity
+    associationRules.foreach(associationRule => {
+      val relation = associationRule.associationName
+      if(associationRule.hasIntMultiplicity){
+        val multiplicity = associationRule.getIntMultiplicity
+        if(associationValues.count(value => value.valueName == relation) != multiplicity){
+          isConcrete = false
+        }
+      }else{
+        isConcrete = false
+      }
+    })
+
+    //each attribute rule must be fulfilled by exactly one value
+    attributeRules.foreach(attributeRule => {
+      if(attributeValues.count(value => value.valueName == attributeRule.name) != 1){
+        isConcrete = false
+      }
+    })
+    println("DEBUG >> " + name + " isConcrete = " + isConcrete)
+    isConcrete
+  }
+
+  def hasSingleton: Future[Boolean] = {
+    registry.getSingletonTypes(name) map(_.nonEmpty)
+  }
+
+  def hasSingletonRoot: Future[Boolean] = {
+    registry.getType(name, composeSingletonIdentity(name)) map (_.isDefined)
+  }
+
+  def updateSingletonRoot(): Future[Option[DeepInstance]] = {
+    unfold() flatMap (_ => removeSingleton() flatMap (_ => {
+      if (!isConcrete) {
+        Future.successful(None)
+      } else {
+        val factory = new InstanceFactory(definitionVerifier.get, modelVerifier.get)
+        factory.setRegistry(registry)
+        factory.newInstance(name, Fragment.composeSingletonIdentity(name)) map (instance => Some(instance))
+      }
+    }))
+  }
+
+  private def removeSingleton(): Future[Any] = {
+    registry.deleteTypeNoCascade(name, Fragment.composeSingletonIdentity(name))
   }
 
   /**
@@ -208,18 +287,6 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   protected def getDefinition: Definition = definition
 
   /**
-   * <p> Private observer object representing a callback that is called if the [[codi.core.Definition Definition]]
-   * changes.
-   * <p> TODO this is unused as of right now
-   */
-  private final object _definitionObserver extends Observer {
-    override def onChange(): Future[Unit] = {
-      //TODO commit here if in some kind of automatic mode
-      Future.successful()
-    }
-  }
-
-  /**
    * <p> Package-private setter for [[codi.core.Registry Registry]].
    * <p> This operation is by default used by the [[codi.core.TypeFactory TypeFactory]] during Fragment construction only.
    *
@@ -264,6 +331,38 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
     results.add(name)
     getParents.foreach(parentFragment => results.addAll(parentFragment.getTypeClosure))
     results.toSet
+  }
+
+  private[codi] def deepAttributeRuleSet: Set[AttributeRule] = {
+    val result = mutable.Set[AttributeRule]()
+    result.addAll(definition.getAttributeRules)
+    applyDeepResult[AttributeRule](result, getParents.map(parent => parent.deepAttributeRuleSet))
+    result.toSet
+  }
+
+  private[codi] def deepAssociationRuleSet: Set[AssociationRule] = {
+    val result = mutable.Set[AssociationRule]()
+    result.addAll(definition.getAssociationRules)
+    applyDeepResult[AssociationRule](result, getParents.map(parent => parent.deepAssociationRuleSet))
+    result.toSet
+  }
+
+  private[codi] def deepValueSet: Set[ConcreteValue] = {
+    val result = mutable.Set[ConcreteValue]()
+    result.addAll(definition.getConcreteValues)
+    applyDeepResult[ConcreteValue](result, getParents.map(parent => parent.deepValueSet))
+    result.toSet
+  }
+
+  private def applyDeepResult[T <: Rule](result: mutable.Set[T], values: Set[Set[T]]): Unit = {
+    values.foreach(ruleSet => {
+      ruleSet.foreach(associationRule => {
+        val overrideOption = result.find(_.isPolymorphEqual(associationRule))
+        if (overrideOption.isEmpty) {
+          result.add(associationRule)
+        }
+      })
+    })
   }
 
   /**
@@ -330,4 +429,19 @@ object Fragment {
    * <p> The built-in constant string value used to represent reference identity Fragments.
    */
   val REFERENCE_IDENTITY = "#"
+
+  /**
+   * <p> The built-in constant string value used to represent singleton identities. I.e. objects/instances
+   * that can and must exist only once in a registry-context.
+   */
+  val SINGLETON_IDENTITY = "$"
+
+  def composeSingletonIdentity(typeName: String): String = SINGLETON_IDENTITY + "_" + typeName
+
+  def decomposeSingletonIdentity(identity: String): String = {
+    identity.split("_")(1)
+  }
+
+  def isSingletonIdentity(identity: String): Boolean = identity.startsWith(SINGLETON_IDENTITY)
+
 }

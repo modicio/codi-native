@@ -17,6 +17,7 @@ package codi.core
 
 import codi.core.datamappings.RuleData
 import codi.core.rules._
+import codi.core.values.ConcreteValue
 import codi.util.Observable
 import codi.verification.DefinitionVerifier
 
@@ -24,7 +25,7 @@ import scala.collection.mutable
 
 /**
  * <p> The Definition class is a final concrete [[codi.core.Base Base]] implementation representing the set of
- * [[codi.core.rules.Rule Rules]] a [[codi.core.Fragment Fragment]] possesses.
+ * [[codi.core.Rule Rules]] a [[codi.core.Fragment Fragment]] possesses.
  * <p> The Definition encapsulates the Rules in individual sets and provides an api to edit the rule-set. Note that the
  * Definition class itself does not ensure validity of the resulting model, especially in an extension-hierarchy. If a new Rule is
  * added or an old Rule is removed, the provided [[codi.verification.DefinitionVerifier DefinitionVerifier]] is called with
@@ -45,15 +46,17 @@ final class Definition
   private val extensions: mutable.Set[ExtensionRule] = mutable.Set()
   private val associations: mutable.Set[AssociationRule] = mutable.Set()
 
-  /**
-   * <p> Get all [[codi.core.rules.Rule Rules]] part of this Definition.
-   *
-   * @return Set[Rule] - all Rules part of the Definition
-   */
-  def getRules: Set[Rule] = Set.from(attributes ++ extensions ++ associations)
+  private val values: mutable.Set[ConcreteValue] = mutable.Set()
 
   /**
-   * <p> Generates the set of [[codi.core.datamappings.RuleData RuleData]] which contains all [[codi.core.rules.Rule Rules]] of
+   * <p> Get all [[codi.core.Rule Rules]] part of this Definition.
+   *
+   * @return Set[codi.core.Rule] - all Rules part of the Definition
+   */
+  def getRules: Set[Rule] = Set.from(attributes ++ extensions ++ associations ++ values)
+
+  /**
+   * <p> Generates the set of [[codi.core.datamappings.RuleData RuleData]] which contains all [[codi.core.Rule Rules]] of
    * this Definition in their serialised form.
    * <p> The name and identity parameters are required because the Definition does not know by which [[codi.core.Fragment Fragment]]
    * it is used. However the RuleData serialisation requires this information.
@@ -68,10 +71,10 @@ final class Definition
 
   /**
    * <p> Fork this Definition according to the overall fork specification. This operation produces a deep copy
-   * of the Definition and all its [[codi.core.rules.Rule Rules]].
+   * of the Definition and all its [[codi.core.Rule Rules]].
    * <p> This operation takes the identity parameter because [[codi.core.rules.ExtensionRule ExtensionRules]] target a
    * specified identity which must be exchanged during the fork.
-   * <p> This operation calls [[codi.core.rules.Rule#fork Rule.fork(identity)]] on each rule.
+   * <p> This operation calls [[codi.core.Rule#fork Rule.fork(identity)]] on each rule.
    *
    * @param identity the identifier of the forked [[codi.core.Fragment Fragment]] following the default usage.
    * @return Definition - the forked deep-copy of this Definition
@@ -83,7 +86,7 @@ final class Definition
   }
 
   /**
-   * <p>Add a [[codi.core.rules.Rule Rule]] to the rule-set represented by this Definition.
+   * <p>Add a [[codi.core.Rule Rule]] to the rule-set represented by this Definition.
    * <p> This operation creates a temporary copy of the rule-set and the provided [[codi.verification.DefinitionVerifier DefinitionVerifier]]
    * decides if the new rule is allowed. If true, thr rule is added to the rule-set and all observers are notified.
    * <p> <strong>Note as of right now, only [[codi.core.rules.AttributeRule AttributeRules]], [[codi.core.rules.AssociationRule AssociationRules]]
@@ -91,7 +94,7 @@ final class Definition
    *
    * TODO provide feedback by returning a success criteria
    *
-   * @param rule the new [[codi.core.rules.Rule Rule]] to add
+   * @param rule the new [[codi.core.Rule Rule]] to add
    */
   private[core] def applyRule(rule: Rule): Unit = {
     val isValid = definitionVerifier.verify(getRules + rule)
@@ -100,13 +103,14 @@ final class Definition
         case rule: AttributeRule => attributes.add(rule)
         case rule: ExtensionRule => extensions.add(rule)
         case rule: AssociationRule => associations.add(rule)
+        case rule: ConcreteValue => values.add(rule)
       }
       notifyObservers()
     }
   }
 
   /**
-   * <p> Remove a [[codi.core.rules.Rule Rule]] from the rule-set represented by this Definition.
+   * <p> Remove a [[codi.core.Rule Rule]] from the rule-set represented by this Definition.
    * <p> This operation creates a temporary copy of the rule-set and the provided [[codi.verification.DefinitionVerifier DefinitionVerifier]]
    * decides if the deletion is allowed. If true, thr rule is removed from the rule-set and all observers are notified.
    * <p> <strong>Note as of right now, only [[codi.core.rules.AttributeRule AttributeRules]], [[codi.core.rules.AssociationRule AssociationRules]]
@@ -114,7 +118,7 @@ final class Definition
    *
    * TODO provide feedback by returning a success criteria
    *
-   * @param rule the [[codi.core.rules.Rule Rule]] to remove
+   * @param rule the [[codi.core.Rule Rule]] to remove
    */
   private[core] def removeRule(rule: Rule): Unit = {
     val rules = getRules
@@ -124,18 +128,19 @@ final class Definition
         case rule: AttributeRule => attributes.remove(rule)
         case rule: ExtensionRule => extensions.remove(rule)
         case rule: AssociationRule => associations.remove(rule)
+        case rule: ConcreteValue => values.remove(rule)
       }
       notifyObservers()
     }
   }
 
   /**
-   * <p> Remove a [[codi.core.rules.Rule Rule]] from the rule-set represented by this Definition.
+   * <p> Remove a [[codi.core.Rule Rule]] from the rule-set represented by this Definition.
    * <p> <strong>See [[codi.core.Definition#removeRule Definition.removeRule()]] for more information!</strong>
    * <p> Note that in certain usecases, unique ids are not yet provided by the individual Rules and this operation
-   * may lead to unexpected results. See [[codi.core.rules.Rule Rule (autoId)]] for more information.
+   * may lead to unexpected results. See [[codi.core.Rule Rule (autoId)]] for more information.
    *
-   * @param ruleID id of the [[codi.core.rules.Rule Rule]] to remove
+   * @param ruleID id of the [[codi.core.Rule Rule]] to remove
    */
   private[core] def removeRuleByID(ruleID: String): Unit = {
     val rule = getRules.find(_.id == ruleID)
@@ -165,6 +170,14 @@ final class Definition
    * @return Set[ExtensionRule] - immutable set of all [[codi.core.rules.ExtensionRule ExtensionRules]]
    */
   override def getExtensionRules: Set[ExtensionRule] = Set.from(extensions)
+
+  /**
+   * <p> Get all [[codi.core.values.ConcreteValue ConcreteValues]] part of this Definition.
+   * <p> The provided result is deep-immutable and safe.
+   *
+   * @return Set[ConcreteValue] - immutable set of all [[codi.core.values.ConcreteValue ConcreteValues]]
+   */
+  override def getConcreteValues: Set[ConcreteValue] = Set.from(values)
 
   /**
    * <p> Not implemented yet. Returns an empty set always

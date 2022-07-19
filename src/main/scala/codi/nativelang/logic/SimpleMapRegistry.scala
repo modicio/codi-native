@@ -18,6 +18,7 @@ package codi.nativelang.logic
 import codi.core._
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -41,6 +42,15 @@ class SimpleMapRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFacto
     Future.successful(result)
   }
 
+  override def getSingletonTypes(name: String): Future[Set[TypeHandle]] = {
+    val typeGroup = typeRegistry.get(name)
+    if (typeGroup.isEmpty) {
+      return Future.successful(Set())
+    }
+    val result = typeGroup.get.filter(element => Fragment.isSingletonIdentity(element._1)).values.toSet
+    Future.successful(result)
+  }
+
   override def setType(typeHandle: TypeHandle): Future[Unit] = {
     val name = typeHandle.getTypeName
     val identity = typeHandle.getTypeIdentity
@@ -59,7 +69,14 @@ class SimpleMapRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFacto
   }
 
   override def get(instanceId: String): Future[Option[DeepInstance]] = {
-    Future.successful(instanceRegistry.get(instanceId))
+    if (DeepInstance.isSingletonRoot(instanceId)) {
+      Future.successful(instanceRegistry.get(
+        DeepInstance.deriveRootSingletonInstanceId(
+          Fragment.decomposeSingletonIdentity(instanceId))))
+    } else {
+      Future.successful(instanceRegistry.get(instanceId))
+    }
+
   }
 
   override def getAll(typeName: String): Future[Set[DeepInstance]] = {
@@ -70,4 +87,29 @@ class SimpleMapRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFacto
     Future.successful(instanceRegistry.addOne(deepInstance.getInstanceId, deepInstance))
   }
 
+  override def deleteTypeNoCascade(name: String, identity: String): Future[Any] = {
+    if (identity == Fragment.REFERENCE_IDENTITY) {
+      val typeGroupOption = typeRegistry.get(name)
+      if (typeGroupOption.isDefined) {
+        Future.successful(typeGroupOption.get.remove(identity))
+      } else {
+        Future.failed(new IllegalArgumentException())
+      }
+    } else if (identity == Fragment.SINGLETON_IDENTITY) {
+      val singletonInstanceId = DeepInstance.deriveSingletonInstanceId(identity, name)
+      val deepInstanceOption = instanceRegistry.get(singletonInstanceId)
+      if (deepInstanceOption.isDefined) {
+        deepInstanceOption.get.unfold() map (unfoldedInstance => {
+          val extensions = unfoldedInstance.getTypeHandle.getFragment.getParents
+          instanceRegistry.remove(singletonInstanceId)
+          val mapOfFutures = extensions.map(extension => deleteTypeNoCascade(extension.name, Fragment.SINGLETON_IDENTITY))
+          Future.sequence(mapOfFutures)
+        })
+      } else {
+        Future.successful()
+      }
+    } else {
+      Future.successful()
+    }
+  }
 }
