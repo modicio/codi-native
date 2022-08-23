@@ -45,7 +45,7 @@ class SimpleMapRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFacto
     Future.successful(result)
   }
 
-  override def setType(typeHandle: TypeHandle): Future[Unit] = {
+  override protected def setNode(typeHandle: TypeHandle): Future[Unit] = {
     val name = typeHandle.getTypeName
     val identity = typeHandle.getTypeIdentity
     if (!typeRegistry.contains(name)) {
@@ -59,7 +59,8 @@ class SimpleMapRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFacto
   }
 
   override def getReferences: Future[Set[TypeHandle]] = {
-    Future.successful(typeRegistry.values.flatMap(_.values).filter(_.getTypeIdentity == Fragment.REFERENCE_IDENTITY).toSet)
+    Future.successful(typeRegistry.values.flatMap(_.values).filter(_.getTypeIdentity == Fragment.REFERENCE_IDENTITY)
+      .toSet ++ baseModels.values.map(_.createHandle))
   }
 
   override def get(instanceId: String): Future[Option[DeepInstance]] = {

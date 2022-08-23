@@ -44,6 +44,9 @@ class TypeFactory
   }
 
   //TODO
-  def loadType(fragmentData: FragmentData, ruleData: Set[RuleData]): TypeHandle = ???
+  def loadType(fragmentData: FragmentData, ruleData: Set[RuleData]): TypeHandle = {
+    //FIXME check if this is a BaseModel...
+    fragmentData.
+  }
 
 }

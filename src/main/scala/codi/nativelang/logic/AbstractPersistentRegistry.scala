@@ -18,12 +18,14 @@ package codi.nativelang.logic
 import codi.core.datamappings._
 import codi.core._
 
-import scala.concurrent.Future
+import scala.collection.mutable
+import scala.concurrent.{ExecutionContext, Future}
 
 abstract class AbstractPersistentRegistry(typeFactory: TypeFactory, instanceFactory: InstanceFactory)
+                                         (implicit executionContext: ExecutionContext)
   extends Registry(typeFactory, instanceFactory) {
 
-  protected def fetchFragmentData(name: String, identity: String): Future[FragmentData]
+  protected def fetchFragmentData(name: String, identity: String): Future[Option[FragmentData]]
 
   protected def fetchFragmentData(identity: String): Future[Set[FragmentData]]
 
@@ -31,7 +33,7 @@ abstract class AbstractPersistentRegistry(typeFactory: TypeFactory, instanceFact
 
   protected def fetchInstanceDataOfType(typeName: String): Future[Set[InstanceData]]
 
-  protected def fetchInstanceData(instanceId: String): Future[InstanceData]
+  protected def fetchInstanceData(instanceId: String): Future[Option[InstanceData]]
 
   protected def fetchInstanceDataOfIdentity(identity: String): Future[Set[InstanceData]]
 
@@ -62,27 +64,79 @@ abstract class AbstractPersistentRegistry(typeFactory: TypeFactory, instanceFact
   protected def writeAssociationData(associationData: Set[AssociationData]): Future[Set[AssociationData]]
 
 
-  override def getType(name: String, identity: String): Future[Option[TypeHandle]] = ???
+  override def getType(name: String, identity: String): Future[Option[TypeHandle]] = {
+    for {
+      fragmentDataOption <- fetchFragmentData(name, identity)
+      ruleData <- fetchRuleData(name, identity)
+    } yield {
+      if(fragmentDataOption.isDefined){
+        val fragmentData = fragmentDataOption.get;
+        Some(typeFactory.loadType(fragmentData, ruleData))
+      }else {
+        None
+      }
+    }
+  }
 
-  //TODO make a difference between default Fragments and BaseModels, maybe we need Reflections here to collect all
-  // BaseModel classes to create the required instance, we just set the identity and pretend its from the db...
+  override def getReferences: Future[Set[TypeHandle]] = {
+    for {
+      fragmentDataSet <- fetchFragmentData(Fragment.REFERENCE_IDENTITY)
+      ruleDataSet <- Future.sequence(fragmentDataSet.map(f => fetchRuleData(f.name, f.identity)))
+    } yield {
+      if(fragmentDataSet.size != ruleDataSet.size){
+        Future.failed(new Exception("Not matching fragment and rule-set relations"))
+      }
+      fragmentDataSet.map(fragmentData => (fragmentData, {
+        ruleDataSet.find(rules => rules.exists(ruleData =>
+          ruleData.fragmentName == fragmentData.name && ruleData.identity == fragmentData.identity))
+      })).map(modelTuple => {
+        val (fragmentData, ruleDataOption) = modelTuple
+        val ruleData: Set[RuleData] = ruleDataOption.getOrElse(Set())
+        typeFactory.loadType(fragmentData, ruleData)
+      }) ++ baseModels.values.map(_.createHandle).toSet
+    }
+  }
 
-  override def getReferences: Future[Set[TypeHandle]] = ???
+  override protected def setNode(typeHandle: TypeHandle): Future[Unit] = {
+    val (fragmentData, ruleData) = typeHandle.getFragment.toData
+    for {
+      _ <- writeRuleData(ruleData)
+      _ <- writeFragmentData(fragmentData)
+    } yield Future.successful()
+  }
 
+  override def get(instanceId: String): Future[Option[DeepInstance]] = {
+    fetchInstanceData(instanceId) flatMap (instanceDataOption => {
+      if(instanceDataOption.isDefined){
+        val instanceData = instanceDataOption.get
+        for {
+          attributeData <- fetchAttributeData(instanceId)
+          extensionData <- fetchExtensionData(instanceId)
+          associationData <- fetchAssociationData(instanceId)
+          typeOption <- getType(instanceData.instanceOf, instanceData.identity)
+        } yield {
+          if(typeOption.isDefined){
+            val shape = new Shape(attributeData, mutable.Set(associationData), extensionData)
+            instanceFactory.loadInstance(instanceData, shape, typeOption.get)
+          }else{
+            None
+          }
+        }
+      }else{
+        Future.successful(None)
+      }
+    })
+  }
 
-  override def setType(typeHandle: TypeHandle): Future[Unit] = ???
+  override def getAll(typeName: String): Future[Set[DeepInstance]] = {
 
-  //TODO make a difference between default Fragments (Nodes isNode = true ) and BaseModels -> BaseModels are not persisted
-  //val (fragmentData, ruleData) = typeHandle.getFragment.toData
-  //TODO this thing recursive with the iterator basically if unfolded otherwise not (sets to go are empty)
+  }
 
-  override def get(identity: String): Future[Option[DeepInstance]] = ???
+  override def setInstance(deepInstance: DeepInstance): Future[Unit] = {
 
+  }
 
-  override def getAll(typeName: String): Future[Set[DeepInstance]] = ???
+  override def deleteTypeNoCascade(name: String, SINGLETON_IDENTITY: String): Future[Any] = {
 
-
-  override def setInstance(deepInstance: DeepInstance): Future[Unit] = ???
-
-  override def deleteTypeNoCascade(name: String, SINGLETON_IDENTITY: String): Future[Any] = ???
+  }
 }

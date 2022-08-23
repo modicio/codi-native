@@ -30,4 +30,4 @@ package codi.core.datamappings
  * @param identity   identity value
  * @param isTemplate flag if the Fragment describes a template-type or instantiable-type
  */
-case class FragmentData(name: String, identity: String, isTemplate: Boolean)
+case class FragmentData(name: String, identity: String, isTemplate: Boolean, isNode: Boolean)
