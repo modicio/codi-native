@@ -129,10 +129,44 @@ abstract class AbstractPersistentRegistry(typeFactory: TypeFactory, instanceFact
   }
 
   override def getAll(typeName: String): Future[Set[DeepInstance]] = {
+    fetchInstanceDataOfType(typeName) flatMap (instanceDataSet =>
+      Future.sequence(instanceDataSet.map(
+        instanceData => get(instanceData.instanceId))) map (results =>
+        results.filter(_.isDefined).map(_.get)))
+  }
+
+  /**
+   *
+   * @param deepInstance
+   * @return
+   */
+  override def setInstance(deepInstance: DeepInstance): Future[Unit] = {
+    val (instanceData, extensionData, attributeData, associationData) = deepInstance.toData
+    get(deepInstance.getInstanceId) flatMap (oldInstanceOption => {
+      val (_, oldExtensionData, oldAttributeData, oldAssociationData) = {
+        if(oldInstanceOption.isDefined){
+          oldInstanceOption.get.toData
+        }else{
+          (_, Set(), Set(), Set())
+        }
+      }
+      for {
+        _ <- writeInstanceData(instanceData)
+        _ <- writeExtensionData(applyExtensions(oldExtensionData, extensionData))
+        _ <- writeAssociationData(applyAssociations(oldAssociationData, associationData))
+        _ <- writeAttributeData(applyAttributes(oldAttributeData, attributeData))
+      } yield {}
+    })
+  }
+  private def applyExtensions(old: Set[ExtensionData], in: Set[ExtensionData]): Set[ExtensionData] = {
 
   }
 
-  override def setInstance(deepInstance: DeepInstance): Future[Unit] = {
+  private def applyAttributes(old: Set[AttributeData], in: Set[AttributeData]): Set[AttributeData] = {
+
+  }
+
+  private def applyAssociations(old: Set[AssociationData], in: Set[AssociationData]): Set[AssociationData] = {
 
   }
 
