@@ -60,7 +60,20 @@ abstract class Registry(val typeFactory: TypeFactory, val instanceFactory: Insta
    */
   protected def setNode(typeHandle: TypeHandle): Future[Unit]
 
-  def deleteTypeNoCascade(name: String, SINGLETON_IDENTITY: String): Future[Any]
+  /**
+   * Remove parts of the model in a way producing a minimal number of overall deletions while trying to retain integrity
+   * <p> <strong>Experimental Feature</strong>
+   * <p> In case of a reference-identity Fragment, the Fragment is deleted only. In consequence, children pointing to that Fragment
+   * and other Fragments associating this Fragment become invalid and must be repaired manually.
+   * <p> In case of a singleton-identity Fragment, the whole singleton-fork of the Fragment tree and the corresponding
+   * [[codi.core.DeepInstance DeepInstance]] tree are removed.
+   * <p> In case of a user-space identity, nothing happens yet => TODO
+   *
+   * @param name     of the [[codi.core.Fragment Fragment]] trying to remove
+   * @param identity of the [[codi.core.Fragment Fragment]] trying to remove
+   * @return
+   */
+  def autoRemove(name: String, SINGLETON_IDENTITY: String): Future[Any]
 
   def get(instanceId: String): Future[Option[DeepInstance]]
   def getAll(typeName: String): Future[Set[DeepInstance]]

@@ -90,6 +90,8 @@ class ExtensionRule(nativeValue: String) extends Rule(nativeValue) {
    */
   override def fork(identity: String): Rule = ExtensionRule.create(parentName, identity, Some(Rule.UNKNOWN_ID))
 
+  override def getDataType: Int = RuleDataType.EXTENSION
+
 }
 
 /**

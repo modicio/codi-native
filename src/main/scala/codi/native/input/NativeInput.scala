@@ -13,16 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package codi.nativelang.input
+package codi.native.input
 
-import io.circe.parser
-import io.circe.generic.auto._
-
-object NativeInputParser {
-
-  def parse(nativeInput: String): NativeInput = {
-    val decodingResult = parser.decode[NativeInput](nativeInput)
-    decodingResult.toOption.getOrElse(throw new Exception("Decoding Error"))
-  }
-
-}
+case class NativeInput(model: Seq[Statement])

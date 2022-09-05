@@ -114,6 +114,8 @@ class AssociationRule(nativeValue: String) extends Rule(nativeValue) {
     }
   }
 
+  override def getDataType: Int = RuleDataType.ASSOCIATION
+
   /**
    *
    * @return

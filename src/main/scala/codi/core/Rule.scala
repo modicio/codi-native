@@ -94,6 +94,8 @@ abstract class Rule(protected val nativeValue: String) {
 
   def isPolymorphEqual(rule: Rule): Boolean = ???
 
+  def getDataType: Int
+
 }
 
 /**

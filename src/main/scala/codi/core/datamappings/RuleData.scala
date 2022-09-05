@@ -30,4 +30,4 @@ import codi.core.Rule
  * @param nativeValue  serialised value of the [[codi.core.Rule Rule]]. Depending on the serialised format, all
  *                     different concrete rules must be distinguishable
  */
-case class RuleData(id: String, fragmentName: String, identity: String, nativeValue: String)
+case class RuleData(id: String, fragmentName: String, identity: String, nativeValue: String, typeOf: Int)

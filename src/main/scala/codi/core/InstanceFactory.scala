@@ -158,16 +158,16 @@ class InstanceFactory(definitionVerifier: DefinitionVerifier,
    * <p> If no instance can be constructed, because no instance data was found or the given TypeHandle is corrupted, an
    * empty option is returned.
    * <p> <strong>In the general case, this operation returns a DeepInstance which is not unfolded!</strong>
-   * Although depending on the used Registry, an unfolded result is possible.
+   * Although depending on the used Registry, an unfolded or partially unfolded (Fragment-side) result is possible.
    *
    * @param instanceData
    * @param configuration
    * @param typeHandle
    * @return
    */
-  def loadInstance(instanceData: InstanceData, configuration: Shape, typeHandle: TypeHandle): Option[DeepInstance] = {
-    //TODO
-    None
+  def loadInstance(instanceData: InstanceData, shape: Shape, typeHandle: TypeHandle): Option[DeepInstance] = {
+    //TODO maybe some verification or remove the option return
+    Some(new DeepInstance(instanceData.instanceId, instanceData.identity, shape, typeHandle, registry))
   }
 
 }

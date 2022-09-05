@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package codi.nativelang.logic
+package codi.native.defaults
 
 import codi.core.TypeHandle
 import codi.verification.ModelVerifier

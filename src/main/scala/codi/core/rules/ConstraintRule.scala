@@ -33,6 +33,8 @@ class ConstraintRule(nativeValue: String) extends Rule(nativeValue) {
 
   override def fork(identity: String): Rule = ???
 
+  override def getDataType: Int = RuleDataType.CONSTRAINT
+
 }
 
 /**

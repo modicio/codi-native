@@ -240,7 +240,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   }
 
   private def removeSingleton(): Future[Any] = {
-    registry.deleteTypeNoCascade(name, Fragment.composeSingletonIdentity(name))
+    registry.autoRemove(name, Fragment.composeSingletonIdentity(name))
   }
 
   /**

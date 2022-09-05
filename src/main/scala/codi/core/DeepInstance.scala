@@ -52,7 +52,7 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
   /**
    * <p>Contains the concrete extensions after unfold() was called.
    */
-  private val unfoldedExtensions: mutable.Set[DeepInstance] = mutable.Set()
+  private val unfoldedExtensions: mutable.Set[DeepInstance] = mutable.Set[DeepInstance]()
 
   /**
    * <p> Produces the [[codi.core.TypeHandle TypeHandle]] of the associated [[codi.core.Fragment Fragment]] type.
@@ -150,9 +150,9 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
   def toData: (InstanceData, Set[ExtensionData], Set[AttributeData], Set[AssociationData]) = {
     (
       InstanceData(instanceId, typeHandle.getTypeName, identity),
-      unfoldedExtensions.map(ext => ExtensionData(0, instanceId, ext.instanceId)).toSet,
-      attributeMap().keySet,
-      getAssociations
+      shape.getExtensions,
+      shape.getAttributes,
+      shape.getAssociations
     )
   }
 
