@@ -112,6 +112,9 @@ class AttributeRule(nativeValue: String) extends Rule(nativeValue) {
       case _ => false
     }
   }
+
+  override def getDataType: Int = RuleDataType.ATTRIBUTE
+
 }
 
 /**

@@ -149,6 +149,25 @@ class InstanceFactory(definitionVerifier: DefinitionVerifier,
 
   //TODO construct Instance from a lot of stuff here #
   // extensions do not need to be considered :D, they are loaded only on unfold
-  def loadInstance(instanceData: InstanceData, configuration: Shape, typeHandle: TypeHandle): DeepInstance = ???
+
+  /**
+   * Load and construct the DeepInstance of a given TypeHandle.
+   * <p> This operation must first check, that an Instance can and should be constructed at all. This is not the case,
+   * if the TypeHandle describes a reference-fragment (#-Identity). In case of singleton objects, type-specific flags
+   * are set.
+   * <p> If no instance can be constructed, because no instance data was found or the given TypeHandle is corrupted, an
+   * empty option is returned.
+   * <p> <strong>In the general case, this operation returns a DeepInstance which is not unfolded!</strong>
+   * Although depending on the used Registry, an unfolded or partially unfolded (Fragment-side) result is possible.
+   *
+   * @param instanceData
+   * @param configuration
+   * @param typeHandle
+   * @return
+   */
+  def loadInstance(instanceData: InstanceData, shape: Shape, typeHandle: TypeHandle): Option[DeepInstance] = {
+    //TODO maybe some verification or remove the option return
+    Some(new DeepInstance(instanceData.instanceId, instanceData.identity, shape, typeHandle, registry))
+  }
 
 }

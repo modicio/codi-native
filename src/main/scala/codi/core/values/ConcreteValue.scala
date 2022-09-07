@@ -16,7 +16,7 @@
 package codi.core.values
 
 import codi.core.Rule
-import codi.core.rules.{AssociationRule, AttributeRule}
+import codi.core.rules.{AssociationRule, AttributeRule, RuleDataType}
 
 /**
  * @param nativeValue he string representation in the native-language format
@@ -29,6 +29,8 @@ class ConcreteValue(nativeValue: String) extends Rule(nativeValue) {
   val valueDescriptor: ValueDescriptor = parseDescriptor
 
   def getValueType: String = valueType
+
+  override def getDataType: Int = RuleDataType.VALUE
 
   def isAttributeValue: Boolean = valueType == ConcreteValue.ATTRIBUTE_VALUE
 

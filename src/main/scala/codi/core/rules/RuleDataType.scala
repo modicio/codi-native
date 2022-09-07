@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package codi.nativelang.logic
 
-import codi.core.Rule
-import codi.verification.DefinitionVerifier
+package codi.core.rules
 
-class SimpleDefinitionVerifier extends DefinitionVerifier {
-
-  override def verify(rules: Set[Rule]): Boolean = true
-
+object RuleDataType {
+  val ATTRIBUTE = 0
+  val VALUE = 1
+  val ASSOCIATION = 2
+  val EXTENSION = 3
+  val BEHAVIOUR = 4
+  val CONSTRAINT = 5
 }

@@ -16,6 +16,8 @@
 package codi.core
 
 import codi.core.datamappings.{FragmentData, RuleData}
+import codi.core.rules.{AssociationRule, AttributeRule, ExtensionRule, RuleDataType}
+import codi.core.values.ConcreteValue
 import codi.verification.{DefinitionVerifier, ModelVerifier}
 
 /**
@@ -43,7 +45,27 @@ class TypeFactory
     fragment.createHandle
   }
 
-  //TODO
-  def loadType(fragmentData: FragmentData, ruleData: Set[RuleData]): TypeHandle = ???
+  def loadType(fragmentData: FragmentData, ruleData: Set[RuleData]): TypeHandle = {
+    val definition = new Definition(definitionVerifier)
+    ruleData.foreach(data => definition.applyRule(loadRule(data)))
+
+    val fragment = new Node(fragmentData.name, fragmentData.identity, fragmentData.isTemplate)
+
+    fragment.setRegistry(registry)
+    fragment.setDefinition(definition)
+    fragment.setVerifiers(definitionVerifier, modelVerifier)
+
+    fragment.createHandle
+  }
+
+  def loadRule(ruleData: RuleData): Rule = {
+    ruleData.typeOf match {
+      case RuleDataType.ATTRIBUTE => new AttributeRule(ruleData.nativeValue)
+      case RuleDataType.VALUE => new ConcreteValue(ruleData.nativeValue)
+      case RuleDataType.ASSOCIATION => new AssociationRule(ruleData.nativeValue)
+      case RuleDataType.EXTENSION => new ExtensionRule(ruleData.nativeValue)
+      case _ => throw new IllegalArgumentException("Cannot determine RuleData typeOf")
+    }
+  }
 
 }

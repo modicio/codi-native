@@ -15,7 +15,7 @@
  */
 package codi.core
 
-import codi.core.datamappings.{AssociationData, AttributeData, InstanceData}
+import codi.core.datamappings.{AssociationData, AttributeData, ExtensionData, InstanceData}
 import codi.core.rules.AttributeRule
 
 import scala.collection.mutable
@@ -52,7 +52,7 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
   /**
    * <p>Contains the concrete extensions after unfold() was called.
    */
-  private val unfoldedExtensions: mutable.Set[DeepInstance] = mutable.Set()
+  private val unfoldedExtensions: mutable.Set[DeepInstance] = mutable.Set[DeepInstance]()
 
   /**
    * <p> Produces the [[codi.core.TypeHandle TypeHandle]] of the associated [[codi.core.Fragment Fragment]] type.
@@ -147,7 +147,14 @@ class DeepInstance(instanceId: String, identity: String, shape: Shape, typeHandl
    *
    * @return Tuple of data representations
    */
-  def toData: (InstanceData, Set[InstanceData], Set[AttributeData], Set[AssociationData]) = ???
+  def toData: (InstanceData, Set[ExtensionData], Set[AttributeData], Set[AssociationData]) = {
+    (
+      InstanceData(instanceId, typeHandle.getTypeName, identity),
+      shape.getExtensions,
+      shape.getAttributes,
+      shape.getAssociations
+    )
+  }
 
   /**
    * <p> Get the map of concrete [[codi.core.datamappings.AttributeData AttributeData]] together with their respective

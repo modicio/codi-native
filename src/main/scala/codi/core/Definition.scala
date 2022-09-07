@@ -66,7 +66,7 @@ final class Definition
    * @return Set[RuleData] - all Rules part of the Definition in their serialised form
    */
   def toData(name: String, identity: String): Set[RuleData] = {
-    getRules.map(rule => RuleData(rule.id, name, identity, rule.serialise()))
+    getRules.map(rule => RuleData(rule.id, name, identity, rule.serialise(), rule.getDataType))
   }
 
   /**

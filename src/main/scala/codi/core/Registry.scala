@@ -15,6 +15,7 @@
  */
 package codi.core
 
+import scala.collection.mutable
 import scala.concurrent.Future
 
 /**
@@ -23,13 +24,56 @@ import scala.concurrent.Future
  */
 abstract class Registry(val typeFactory: TypeFactory, val instanceFactory: InstanceFactory) {
 
+  protected val baseModels: mutable.Map[String, BaseModel] = mutable.Map[String, BaseModel]()
+
   def getType(name: String, identity: String): Future[Option[TypeHandle]]
   def getReferences: Future[Set[TypeHandle]]
   def getSingletonTypes(name: String): Future[Set[TypeHandle]]
 
-  def setType(typeHandle: TypeHandle): Future[Unit]
+  /**
+   * Add a [[codi.core.Fragment Fragment]] to this Registry.
+   * <p> This operation must distinguish between [[codi.core.BaseModel BaseModels]] with reference-identity and any other
+   * model-elements. reference-BaseModels are always stored only in a non-persistent data structure and not passed to the
+   * template-method handling persistence because reference BaseModels are coded into the application logic and are set
+   * on application start always.
+   *
+   * @param typeHandle [[codi.core.TypeHandle TypeHandle]] of the model-element to store/register
+   * @return
+   */
+  def setType(typeHandle: TypeHandle): Future[Unit] = {
+    val fragment = typeHandle.getFragment
+    fragment match {
+      case fragment: BaseModel => {
+        baseModels.put(fragment.name, fragment)
+        Future.successful()
+      }
+      case _ => setNode(typeHandle)
+    }
+  }
 
-  def deleteTypeNoCascade(name: String, SINGLETON_IDENTITY: String): Future[Any]
+  /**
+   * Template-method called by [[codi.core.Registry#setType setType()]] exclusively.
+   * <p> This operation is implemented by a concrete registry and stores a new dynamic or forked model-element.
+   *
+   * @param typeHandle [[codi.core.TypeHandle TypeHandle]] of a dynamic or forked model-element to store/register
+   * @return
+   */
+  protected def setNode(typeHandle: TypeHandle): Future[Unit]
+
+  /**
+   * Remove parts of the model in a way producing a minimal number of overall deletions while trying to retain integrity
+   * <p> <strong>Experimental Feature</strong>
+   * <p> In case of a reference-identity Fragment, the Fragment is deleted only. In consequence, children pointing to that Fragment
+   * and other Fragments associating this Fragment become invalid and must be repaired manually.
+   * <p> In case of a singleton-identity Fragment, the whole singleton-fork of the Fragment tree and the corresponding
+   * [[codi.core.DeepInstance DeepInstance]] tree are removed.
+   * <p> In case of a user-space identity, nothing happens yet => TODO
+   *
+   * @param name     of the [[codi.core.Fragment Fragment]] trying to remove
+   * @param identity of the [[codi.core.Fragment Fragment]] trying to remove
+   * @return
+   */
+  def autoRemove(name: String, SINGLETON_IDENTITY: String): Future[Any]
 
   def get(instanceId: String): Future[Option[DeepInstance]]
   def getAll(typeName: String): Future[Set[DeepInstance]]

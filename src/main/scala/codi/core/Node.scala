@@ -68,7 +68,7 @@ class Node
   }
 
   override private[codi] def toData: (FragmentData, Set[RuleData]) = {
-    val fragmentData = FragmentData(name, identity, isTemplate)
+    val fragmentData = FragmentData(name, identity, isTemplate, isNode = true)
     val ruleData = definition.toData(name, identity)
     (fragmentData, ruleData)
   }

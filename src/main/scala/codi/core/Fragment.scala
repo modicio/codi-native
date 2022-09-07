@@ -121,8 +121,13 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   /**
    * <p> Fork this Fragment. This operation creates a copy of Fragment and [[codi.core.Definition Definition]] with
    * a new identity propagated through the model.
-   * <p> Note: this operations does only for this particular Fragment. If a Fragment-hierarchy should eb forked, this
-   * operation must be applied to all Fragments this Fragment extends manually with the same identity parameter.
+   * <p> Note: this operations does only work for this particular Fragment in general case. If called on a Node,
+   * the refined implementation can change this behaviour.
+   * <p> The forked Fragment is added to the registry immediately.
+   * <p> TODO this operation is lazy, it returns before the Fragment is stored in the registry.
+   *      This operation should return a Future instead.
+   *
+   * <p> <strong>If a BaseModel is forked, it becomes a Node!<strong>
    *
    * @param identity the new identity the forked Fragment receives
    * @return Fragment - the forked Fragment
@@ -235,7 +240,7 @@ abstract class Fragment(val name: String, val identity: String, val isTemplate: 
   }
 
   private def removeSingleton(): Future[Any] = {
-    registry.deleteTypeNoCascade(name, Fragment.composeSingletonIdentity(name))
+    registry.autoRemove(name, Fragment.composeSingletonIdentity(name))
   }
 
   /**
